@@ -1,0 +1,45 @@
+import { useQuery } from "@tanstack/react-query"
+import { DashboardService } from "@/services/dashboard.service"
+import { InvoiceService } from "@/services/invoice.service"
+import { ListInvoice } from "@/lib/types"
+
+interface UseAuditorDashboardOptions {
+    enabled?: boolean;
+}
+
+export function useAuditorDashboard({ enabled = true }: UseAuditorDashboardOptions = {}) {
+    const { data: allInvoices = [], isLoading } = useQuery({
+        queryKey: ["invoices"],
+        queryFn: async () => {
+            const res = await InvoiceService.list()
+            return res.data?.items ?? []
+        },
+        enabled
+    })
+
+    const pendingReviews = allInvoices.filter((i: ListInvoice) => i.status === "pending")
+        .sort((a: ListInvoice, b: ListInvoice) => new Date(a.invoiceDate ?? 0).getTime() - new Date(b.invoiceDate ?? 0).getTime())
+
+    const flaggedInvoices = allInvoices.filter((i: ListInvoice) =>
+        i.status === "flagged" ||
+        i.aiVerdict?.verdict === "flagged"
+    )
+
+    const verifiedInvoices = allInvoices.filter((i: ListInvoice) =>
+        i.status === "clean" || i.aiVerdict?.verdict === "clean"
+    )
+
+    const legacyStats = [
+        { label: "Unreviewed Invoices", value: pendingReviews.length, change: "+0", trend: "up" },
+        { label: "Flagged Invoices", value: flaggedInvoices.length, change: "+0", trend: "down" },
+        { label: "Verified Invoices", value: verifiedInvoices.length, change: "+0", trend: "up" },
+        { label: "Total Invoices", value: allInvoices.length, change: "+0", trend: "up" },
+    ]
+
+    return {
+        stats: legacyStats,
+        pendingReviews,
+        flaggedInvoices,
+        isLoading
+    }
+}
