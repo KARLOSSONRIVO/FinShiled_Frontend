@@ -16,7 +16,7 @@ export type ApprovalPoint = {
 }
 
 export type GroupedRow = {
-    name: string    // companyName | uploadedByName
+    name: string    // companyName | uploadedBy (user ID)
     total: number
     clean: number
     flagged: number
@@ -27,6 +27,8 @@ export type GroupedRow = {
 type InvoiceBase = {
     uploadedAt?: string
     createdAt?: string
+    invoiceDate?: string
+    date?: string
     status?: string
     reviewDecision?: string
     aiVerdict?: { verdict?: string; riskScore?: number }
@@ -36,7 +38,8 @@ type InvoiceBase = {
 }
 
 function getDate(inv: InvoiceBase): Date | null {
-    const raw = inv.uploadedAt ?? inv.createdAt
+    // Mirror the fallback chain used across existing hooks
+    const raw = inv.uploadedAt ?? inv.createdAt ?? inv.invoiceDate ?? inv.date
     if (!raw) return null
     const d = new Date(raw)
     return isNaN(d.getTime()) ? null : d
@@ -180,8 +183,10 @@ export function computeApprovalRate(invoices: InvoiceBase[]): ApprovalPoint[] {
 }
 
 // ─── groupInvoicesByKey ───────────────────────────────────────────────────────
-// Groups invoices by a string field (e.g. "companyName", "uploadedByName").
+// Groups invoices by a string field (e.g. "companyName", "uploadedBy").
 // Returns rows sorted by total descending.
+// Note: uploadedBy from the API is a MongoDB ObjectId string — the component
+//       renders it as a truncated ID. uploadedByName is NOT populated by the API.
 
 export function groupInvoicesByKey(
     invoices: InvoiceBase[],
@@ -200,5 +205,9 @@ export function groupInvoicesByKey(
         else if (isFlagged(inv)) row.flagged++
     }
 
-    return Array.from(map.values()).sort((a, b) => b.total - a.total)
+    const all = Array.from(map.values()).sort((a, b) => b.total - a.total)
+
+    // If there are real rows alongside Unknown, drop Unknown (it just means the field was unset)
+    const real = all.filter((r) => r.name !== "Unknown")
+    return real.length > 0 ? real : all
 }
