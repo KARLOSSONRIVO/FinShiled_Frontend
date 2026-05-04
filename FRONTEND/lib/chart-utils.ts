@@ -1,12 +1,12 @@
-// ─── Types ───────────────────────────────────────────────────────────────────
+// --- Types -------------------------------------------------------------------
 
-export type Period = "weekly" | "monthly"
+export type Period = "weekly" | "monthly" | "yearly"
 
 export type RiskGraphPoint = {
     label: string   // "Week 1" | "Jan" etc.
     clean: number   // clean/approved invoice count in period
     flagged: number // flagged/rejected invoice count in period
-    risk: number    // avg aiVerdict.riskScore in period, clamped 0–100
+    risk: number    // avg aiVerdict.riskScore in period, clamped 0-100
 }
 
 export type ApprovalPoint = {
@@ -22,7 +22,7 @@ export type GroupedRow = {
     flagged: number
 }
 
-// ─── Shared helpers ───────────────────────────────────────────────────────────
+// --- Shared helpers -----------------------------------------------------------
 
 type InvoiceBase = {
     uploadedAt?: string
@@ -71,33 +71,31 @@ function isFlagged(inv: InvoiceBase): boolean {
     )
 }
 
-// ─── groupInvoicesByPeriod ────────────────────────────────────────────────────
-// Weekly:  4 buckets — last 28 days, each 7 days, labeled "Week 1"…"Week 4"
-// Monthly: 6 buckets — last 6 calendar months, labeled "Jan"…"Dec"
-
+// --- groupInvoicesByPeriod ------------------------------
 export function groupInvoicesByPeriod(
     invoices: InvoiceBase[],
-    period: Period
+    period: Period,
+    dateRange?: string
 ): RiskGraphPoint[] {
     const now = new Date()
 
     if (period === "weekly") {
-        const buckets: RiskGraphPoint[] = Array.from({ length: 4 }, (_, i) => ({
+        const numWeeks = dateRange ? parseInt(dateRange) : 4
+        const buckets: RiskGraphPoint[] = Array.from({ length: numWeeks }, (_, i) => ({
             label: `Week ${i + 1}`,
             clean: 0,
             flagged: 0,
             risk: 0,
         }))
-        const riskSums = [0, 0, 0, 0]
-        const riskCounts = [0, 0, 0, 0]
+        const riskSums = new Array(numWeeks).fill(0)
+        const riskCounts = new Array(numWeeks).fill(0)
 
         for (const inv of invoices) {
             const d = getDate(inv)
             if (!d) continue
             const daysAgo = Math.floor((now.getTime() - d.getTime()) / 86_400_000)
-            if (daysAgo < 0 || daysAgo >= 28) continue
-            // Week 1 = oldest (21–27 days ago), Week 4 = most recent (0–6 days ago)
-            const bucketIndex = 3 - Math.floor(daysAgo / 7)
+            if (daysAgo < 0 || daysAgo >= numWeeks * 7) continue
+            const bucketIndex = (numWeeks - 1) - Math.floor(daysAgo / 7)
             if (isClean(inv)) buckets[bucketIndex].clean++
             else if (isFlagged(inv)) buckets[bucketIndex].flagged++
             const score = inv.aiVerdict?.riskScore
@@ -115,54 +113,115 @@ export function groupInvoicesByPeriod(
         }))
     }
 
-    // Monthly
-    const months: RiskGraphPoint[] = []
-    const riskSums: number[] = []
-    const riskCounts: number[] = []
+    if (period === "monthly" || (period === "yearly" && dateRange !== "all" && dateRange !== undefined)) {
+        let numMonths = 6
+        let targetYear = now.getFullYear()
+        let targetMonth = now.getMonth()
 
-    for (let i = 5; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-        months.push({
-            label: d.toLocaleString("default", { month: "short" }),
-            clean: 0,
-            flagged: 0,
-            risk: 0,
-        })
-        riskSums.push(0)
-        riskCounts.push(0)
+        if (period === "monthly") {
+            numMonths = dateRange ? parseInt(dateRange) : 6
+        } else {
+            numMonths = 12
+            targetYear = parseInt(dateRange || String(now.getFullYear()))
+            targetMonth = 11 // Dec
+        }
+
+        const months: RiskGraphPoint[] = []
+        const riskSums: number[] = []
+        const riskCounts: number[] = []
+
+        for (let i = numMonths - 1; i >= 0; i--) {
+            const d = new Date(targetYear, targetMonth - i, 1)
+            months.push({
+                label: d.toLocaleString("default", { month: "short" }),
+                clean: 0,
+                flagged: 0,
+                risk: 0,
+            })
+            riskSums.push(0)
+            riskCounts.push(0)
+        }
+
+        for (const inv of invoices) {
+            const d = getDate(inv)
+            if (!d) continue
+            for (let i = 0; i < numMonths; i++) {
+                const target = new Date(targetYear, targetMonth - ((numMonths - 1) - i), 1)
+                if (
+                    d.getFullYear() === target.getFullYear() &&
+                    d.getMonth() === target.getMonth()
+                ) {
+                    if (isClean(inv)) months[i].clean++
+                    else if (isFlagged(inv)) months[i].flagged++
+                    const score = inv.aiVerdict?.riskScore
+                    if (typeof score === "number" && !isNaN(score)) {
+                        riskSums[i] += score
+                        riskCounts[i]++
+                    }
+                    break
+                }
+            }
+        }
+
+        return months.map((m, i) => ({
+            ...m,
+            risk: riskCounts[i] > 0
+                ? Math.min(100, Math.round(riskSums[i] / riskCounts[i]))
+                : 0,
+        }))
+    }
+
+    // Yearly (All Years)
+    const yearMap = new Map<number, { clean: number; flagged: number; sum: number; count: number }>()
+    let minYear = now.getFullYear()
+    let maxYear = now.getFullYear()
+
+    for (const inv of invoices) {
+        const d = getDate(inv)
+        if (!d) continue
+        const y = d.getFullYear()
+        minYear = Math.min(minYear, y)
+        maxYear = Math.max(maxYear, y)
+    }
+
+    if (minYear === maxYear) {
+        minYear = maxYear - 2
+    }
+
+    for (let y = minYear; y <= maxYear; y++) {
+        yearMap.set(y, { clean: 0, flagged: 0, sum: 0, count: 0 })
     }
 
     for (const inv of invoices) {
         const d = getDate(inv)
         if (!d) continue
-        for (let i = 0; i < 6; i++) {
-            const target = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
-            if (
-                d.getFullYear() === target.getFullYear() &&
-                d.getMonth() === target.getMonth()
-            ) {
-                if (isClean(inv)) months[i].clean++
-                else if (isFlagged(inv)) months[i].flagged++
-                const score = inv.aiVerdict?.riskScore
-                if (typeof score === "number" && !isNaN(score)) {
-                    riskSums[i] += score
-                    riskCounts[i]++
-                }
-                break
-            }
+        const y = d.getFullYear()
+        const bucket = yearMap.get(y)
+        if (!bucket) continue
+
+        if (isClean(inv)) bucket.clean++
+        else if (isFlagged(inv)) bucket.flagged++
+
+        const score = inv.aiVerdict?.riskScore
+        if (typeof score === "number" && !isNaN(score)) {
+            bucket.sum += score
+            bucket.count++
         }
     }
 
-    return months.map((m, i) => ({
-        ...m,
-        risk: riskCounts[i] > 0
-            ? Math.min(100, Math.round(riskSums[i] / riskCounts[i]))
-            : 0,
-    }))
+    return Array.from(yearMap.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([y, b]) => ({
+            label: String(y),
+            clean: b.clean,
+            flagged: b.flagged,
+            risk: b.count > 0 ? Math.min(100, Math.round(b.sum / b.count)) : 0
+        }))
 }
 
-// ─── computeApprovalRate ──────────────────────────────────────────────────────
-// Flat counts from entire invoice array — period-agnostic (current state)
+// --- computeApprovalRate ------------------------------------------------------
+// Flat counts from entire invoice array - period-agnostic (current state)
+// Only checks human status/decision to properly categorize Pending invoices.
 
 export function computeApprovalRate(invoices: InvoiceBase[]): ApprovalPoint[] {
     let accepted = 0
@@ -170,9 +229,16 @@ export function computeApprovalRate(invoices: InvoiceBase[]): ApprovalPoint[] {
     let pending = 0
 
     for (const inv of invoices) {
-        if (isClean(inv)) accepted++
-        else if (isFlagged(inv)) rejected++
-        else pending++
+        const status = String(inv.status ?? "").toLowerCase()
+        const decision = String(inv.reviewDecision ?? "").toLowerCase()
+
+        if (status === "approved" || status === "accepted" || status === "clean" || status === "anchored" || decision === "approved") {
+            accepted++
+        } else if (status === "rejected" || status === "flagged" || decision === "rejected") {
+            rejected++
+        } else {
+            pending++
+        }
     }
 
     return [
@@ -182,10 +248,10 @@ export function computeApprovalRate(invoices: InvoiceBase[]): ApprovalPoint[] {
     ]
 }
 
-// ─── groupInvoicesByKey ───────────────────────────────────────────────────────
+// --- groupInvoicesByKey -------------------------------------------------------
 // Groups invoices by a string field (e.g. "companyName", "uploadedBy").
 // Returns rows sorted by total descending.
-// Note: uploadedBy from the API is a MongoDB ObjectId string — the component
+// Note: uploadedBy from the API is a MongoDB ObjectId string - the component
 //       renders it as a truncated ID. uploadedByName is NOT populated by the API.
 
 export function groupInvoicesByKey(
@@ -211,3 +277,4 @@ export function groupInvoicesByKey(
     const real = all.filter((r) => r.name !== "Unknown")
     return real.length > 0 ? real : all
 }
+

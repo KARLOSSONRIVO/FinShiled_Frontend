@@ -50,9 +50,9 @@ export function ApprovalRateDonut({
                         <p className="text-sm text-muted-foreground">No data available</p>
                     </div>
                 ) : (
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 py-2">
                         {/* Donut */}
-                        <div className="h-[180px] md:h-[200px] flex-1 min-w-0">
+                        <div className="h-[180px] w-[180px] md:h-[220px] md:w-[220px] shrink-0">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
@@ -61,10 +61,11 @@ export function ApprovalRateDonut({
                                         nameKey="name"
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius="45%"
-                                        outerRadius="75%"
-                                        strokeWidth={2}
+                                        innerRadius="60%"
+                                        outerRadius="85%"
+                                        strokeWidth={3}
                                         stroke="hsl(var(--card))"
+                                        paddingAngle={2}
                                     >
                                         {data.map((entry) => (
                                             <Cell key={entry.name} fill={entry.color} />
@@ -76,18 +77,18 @@ export function ApprovalRateDonut({
                         </div>
 
                         {/* Legend */}
-                        <div className="flex flex-col gap-3 shrink-0">
+                        <div className="flex flex-wrap md:flex-col justify-center gap-4 md:gap-3 shrink-0">
                             {data.map((entry) => {
                                 const pct = total > 0 ? Math.round((entry.value / total) * 100) : 0
                                 return (
                                     <div key={entry.name} className="flex items-center gap-2">
                                         <span
-                                            className="h-2.5 w-2.5 rounded-full shrink-0"
+                                            className="h-3 w-3 rounded-full shrink-0"
                                             style={{ background: entry.color }}
                                         />
                                         <div className="text-xs">
                                             <p className="text-muted-foreground leading-none">{entry.name}</p>
-                                            <p className="font-semibold text-foreground mt-0.5">
+                                            <p className="font-semibold text-foreground mt-1">
                                                 {entry.value}
                                                 <span className="font-normal text-muted-foreground ml-1">
                                                     ({pct}%)

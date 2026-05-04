@@ -86,6 +86,7 @@ export function useManagerDashboard({ enabled = true }: UseManagerDashboardOptio
         totalValue: stats?.totalValue || totalValue,
         recentInvoices,
         flaggedInvoices,
+        allInvoices,
         isLoading
     }
 }

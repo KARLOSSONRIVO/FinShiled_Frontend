@@ -17,6 +17,11 @@ interface DashboardChartFiltersProps {
     company?: string
     onCompanyChange?: (value: string) => void
     companies?: string[]
+    
+    // New Range Props
+    dateRange?: string
+    onDateRangeChange?: (value: string) => void
+    availableYears?: number[]
 }
 
 export function DashboardChartFilters({
@@ -26,6 +31,9 @@ export function DashboardChartFilters({
     company = "all",
     onCompanyChange,
     companies = [],
+    dateRange,
+    onDateRangeChange,
+    availableYears,
 }: DashboardChartFiltersProps) {
     return (
         <div className="flex items-center gap-2 flex-wrap">
@@ -58,8 +66,46 @@ export function DashboardChartFilters({
                 <SelectContent>
                     <SelectItem value="weekly">Weekly</SelectItem>
                     <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="yearly">Yearly</SelectItem>
                 </SelectContent>
             </Select>
+
+            {dateRange && onDateRangeChange && (
+                <Select value={dateRange} onValueChange={onDateRangeChange}>
+                    <SelectTrigger
+                        size="sm"
+                        className="gap-1.5 text-xs h-8 pr-2 border-border/60 bg-card"
+                    >
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {period === "weekly" && (
+                            <>
+                                <SelectItem value="1">Last 1 Week</SelectItem>
+                                <SelectItem value="2">Last 2 Weeks</SelectItem>
+                                <SelectItem value="3">Last 3 Weeks</SelectItem>
+                                <SelectItem value="4">Last 4 Weeks</SelectItem>
+                            </>
+                        )}
+                        {period === "monthly" && (
+                            <>
+                                <SelectItem value="1">Last 1 Month</SelectItem>
+                                <SelectItem value="3">Last 3 Months</SelectItem>
+                                <SelectItem value="6">Last 6 Months</SelectItem>
+                                <SelectItem value="12">Last 12 Months</SelectItem>
+                            </>
+                        )}
+                        {period === "yearly" && (
+                            <>
+                                <SelectItem value="all">All Years</SelectItem>
+                                {availableYears?.map((y) => (
+                                    <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                                ))}
+                            </>
+                        )}
+                    </SelectContent>
+                </Select>
+            )}
         </div>
     )
 }
