@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useAuth } from "@/hooks/global/use-auth"
 import { ManagerStats } from "@/components/dashboard/ManagerStats"
 import { useManagerDashboard } from "@/hooks/company-manager/dashboard/use-manager-dashboard"

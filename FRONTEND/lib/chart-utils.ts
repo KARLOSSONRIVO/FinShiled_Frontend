@@ -16,7 +16,7 @@ export type ApprovalPoint = {
 }
 
 export type GroupedRow = {
-    name: string    // companyName | uploadedBy (user ID)
+    name: string    // companyName | uploadedByUserId (user ID)
     total: number
     clean: number
     flagged: number
@@ -249,9 +249,8 @@ export function computeApprovalRate(invoices: InvoiceBase[]): ApprovalPoint[] {
 }
 
 // --- groupInvoicesByKey -------------------------------------------------------
-// Groups invoices by a string field (e.g. "companyName", "uploadedBy").
-// Returns rows sorted by total descending.
-// Note: uploadedBy from the API is a MongoDB ObjectId string - the component
+// Groups invoices by a string field (e.g. "companyName", "uploadedByUserId").
+// Note: uploadedByUserId from the API is a MongoDB ObjectId string - the component
 //       renders it as a truncated ID. uploadedByName is NOT populated by the API.
 
 export function groupInvoicesByKey(
@@ -261,7 +260,14 @@ export function groupInvoicesByKey(
     const map = new Map<string, GroupedRow>()
 
     for (const inv of invoices) {
-        const name: string = inv[key] || "Unknown"
+        let name: string = inv[key]
+        
+        // Fallbacks just in case the API maps it differently
+        if (!name && (key.includes("uploadedBy") || key === "userId")) {
+            name = inv.uploadedByUserId || inv.uploadedBy || inv.userId || inv.uploadedByName
+        }
+        if (!name) name = "Unknown"
+
         if (!map.has(name)) {
             map.set(name, { name, total: 0, clean: 0, flagged: 0 })
         }
