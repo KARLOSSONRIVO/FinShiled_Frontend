@@ -50,6 +50,7 @@ export function useRegulatorDashboard({ enabled = true }: UseRegulatorDashboardO
         totalValue,
         flaggedCount,
         recentInvoices,
+        allInvoices: invoices,
         totalInvoices: invoices.length,
         isLoading: statsLoading || invoicesLoading
     }

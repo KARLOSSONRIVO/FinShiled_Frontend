@@ -1,16 +1,21 @@
 "use client"
 
 import { FileText, Link2, AlertTriangle, ScrollText } from "lucide-react"
-import { useRegulatorDashboard } from "@/hooks/regulator/use-regulator-dashboard"
+interface RegulatorStatsProps {
+    totalInvoices: number
+    totalValue: number
+    verifiedOnChain: number
+    flaggedCount: number
+    companiesCount: number
+}
 
-export function RegulatorStats() {
-    const {
-        totalInvoices,
-        totalValue,
-        verifiedOnChain,
-        flaggedCount,
-        companiesCount
-    } = useRegulatorDashboard()
+export function RegulatorStats({
+    totalInvoices,
+    totalValue,
+    verifiedOnChain,
+    flaggedCount,
+    companiesCount
+}: RegulatorStatsProps) {
 
     const renderCard = (title: string, value: string | number, description: string, icon: React.ReactNode, colorClass: string, bgGlow: string) => (
         <div className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-black/10 dark:hover:border-white/10">
