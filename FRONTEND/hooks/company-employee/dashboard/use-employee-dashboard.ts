@@ -68,6 +68,7 @@ export function useEmployeeDashboard({ enabled = true }: UseEmployeeDashboardOpt
         rejectedCount,
         recentInvoices,
         rejectedInvoices,
+        allInvoices,
         isLoading
     }
 }

@@ -40,6 +40,7 @@ export function useAuditorDashboard({ enabled = true }: UseAuditorDashboardOptio
         stats: legacyStats,
         pendingReviews,
         flaggedInvoices,
+        allInvoices,
         isLoading
     }
 }
