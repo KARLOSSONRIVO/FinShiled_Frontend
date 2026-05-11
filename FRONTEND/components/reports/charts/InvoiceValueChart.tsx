@@ -27,8 +27,8 @@ export function InvoiceValueChart({ data, title = "Invoice Value Over Time" }: I
     return (
         <div className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
             <h3 className="text-base font-semibold text-foreground mb-4">{title}</h3>
-            <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+            <ResponsiveContainer width="100%" height={240}>
+                <AreaChart data={data} margin={{ top: 10, right: 24, left: 8, bottom: 20 }}>
                     <defs>
                         <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
@@ -41,13 +41,15 @@ export function InvoiceValueChart({ data, title = "Invoice Value Over Time" }: I
                         tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                         axisLine={false}
                         tickLine={false}
+                        dy={12}
                     />
                     <YAxis
                         tickFormatter={formatValue}
                         tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
                         axisLine={false}
                         tickLine={false}
-                        width={52}
+                        width={62}
+                        dx={-4}
                     />
                     <Tooltip
                         formatter={(v: number) => [formatValue(v), "Total Value"]}

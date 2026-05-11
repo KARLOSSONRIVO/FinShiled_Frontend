@@ -77,13 +77,18 @@ export type InvoiceExportRow = {
 }
 
 export function invoicesToExportRows(invoices: any[]): InvoiceExportRow[] {
+    const capitalize = (s: string | undefined | null) => {
+        if (!s) return ""
+        return String(s).charAt(0).toUpperCase() + String(s).slice(1).toLowerCase()
+    }
+
     return invoices.map((inv) => ({
         "Invoice #": inv.invoiceNumber ?? inv.invoiceNo ?? "",
         Date: inv.invoiceDate ?? inv.date ?? inv.uploadedAt ?? inv.createdAt ?? "",
         Company: inv.companyName ?? "",
         Amount: inv.totalAmount ?? inv.amount ?? "",
-        Status: inv.status ?? "",
-        "AI Verdict": inv.aiVerdict?.verdict ?? "",
+        Status: capitalize(inv.status),
+        "AI Verdict": capitalize(inv.aiVerdict?.verdict),
         "Risk Score": inv.aiVerdict?.riskScore ?? "",
     }))
 }
