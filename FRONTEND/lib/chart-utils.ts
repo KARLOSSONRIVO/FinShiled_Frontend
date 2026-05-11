@@ -284,3 +284,73 @@ export function groupInvoicesByKey(
     return real.length > 0 ? real : all
 }
 
+// --- ReportDataPoint ----------------------------------------------------------
+
+export type ReportDataPoint = {
+    label: string       // "Jan" | "2023" etc.
+    approved: number
+    pending: number
+    rejected: number
+    value: number       // sum of invoice.amount ?? invoice.totalAmount
+}
+
+// --- groupInvoicesForReports --------------------------------------------------
+// Monthly: last 6 calendar months (oldest → newest)
+// Yearly:  last 4 calendar years  (oldest → newest)
+
+export function groupInvoicesForReports(
+    invoices: InvoiceBase[],
+    mode: "monthly" | "yearly"
+): ReportDataPoint[] {
+    const now = new Date()
+
+    if (mode === "monthly") {
+        const months: ReportDataPoint[] = []
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+            months.push({
+                label: d.toLocaleString("default", { month: "short" }),
+                approved: 0, pending: 0, rejected: 0, value: 0,
+            })
+        }
+
+        for (const inv of invoices) {
+            const d = getDate(inv)
+            if (!d) continue
+            const diff = (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth()
+            if (diff < 0 || diff > 5) continue
+            const bucket = months[5 - diff]
+            const amount = Number((inv as any).amount ?? (inv as any).totalAmount ?? 0)
+
+            if (isClean(inv)) bucket.approved++
+            else if (isFlagged(inv)) bucket.rejected++
+            else bucket.pending++
+            bucket.value += amount
+        }
+        return months
+    }
+
+    // yearly — last 4 calendar years
+    const years: ReportDataPoint[] = []
+    for (let i = 3; i >= 0; i--) {
+        years.push({
+            label: String(now.getFullYear() - i),
+            approved: 0, pending: 0, rejected: 0, value: 0,
+        })
+    }
+
+    for (const inv of invoices) {
+        const d = getDate(inv)
+        if (!d) continue
+        const diff = now.getFullYear() - d.getFullYear()
+        if (diff < 0 || diff > 3) continue
+        const bucket = years[3 - diff]
+        const amount = Number((inv as any).amount ?? (inv as any).totalAmount ?? 0)
+
+        if (isClean(inv)) bucket.approved++
+        else if (isFlagged(inv)) bucket.rejected++
+        else bucket.pending++
+        bucket.value += amount
+    }
+    return years
+}
