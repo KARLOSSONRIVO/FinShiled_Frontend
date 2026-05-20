@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { AppSidebar, NavLink } from "@/components/layout/AppSidebar"
 import { TopBar } from "@/components/layout/TopBar"
 import { usePathname } from "next/navigation"
@@ -13,7 +13,7 @@ import {
     FileBarChart,
 } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
-
+ 
 const auditorLinks: NavLink[] = [
     { href: "/admin/auditor", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/auditor/invoices", label: "All Invoices", icon: FileText },
@@ -22,15 +22,21 @@ const auditorLinks: NavLink[] = [
     { href: "/admin/auditor/reports", label: "Reports", icon: FileBarChart },
     { href: "/admin/auditor/blockchain", label: "Blockchain Ledger", icon: Link2 },
 ]
-
+ 
 export default function AuditorLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
     const pathname = usePathname()
-    const [collapsed, setCollapsed] = useState(false)
+    const [collapsed, setCollapsed] = useState(true)
     const { user } = useAuth()
+ 
+    useEffect(() => {
+        if (window.innerWidth >= 768) {
+            setCollapsed(false)
+        }
+    }, [])
 
     // Determine title based on path
     const getPageTitle = (path: string) => {

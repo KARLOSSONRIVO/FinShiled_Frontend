@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { AppSidebar, NavLink } from "@/components/layout/AppSidebar"
 import { TopBar } from "@/components/layout/TopBar"
 import { usePathname } from "next/navigation"
@@ -15,7 +15,7 @@ import {
     ScrollText
 } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
-
+ 
 const managerLinks: NavLink[] = [
     { href: "/company/manager", label: "Dashboard", icon: LayoutDashboard },
     { href: "/company/manager/upload", label: "Upload Invoice", icon: Upload },
@@ -24,17 +24,23 @@ const managerLinks: NavLink[] = [
     { href: "/company/manager/alerts", label: "Flagged Queue", icon: AlertTriangle },
     { href: "/company/manager/reports", label: "Reports", icon: BarChart3 },
 ]
-
+ 
 export default function CompanyManagerLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
     const pathname = usePathname()
-    const [collapsed, setCollapsed] = useState(false)
-
+    const [collapsed, setCollapsed] = useState(true)
+ 
     const { user } = useAuth()
-
+ 
+    useEffect(() => {
+        if (window.innerWidth >= 768) {
+            setCollapsed(false)
+        }
+    }, [])
+ 
     // Determine title based on path
     const getPageTitle = (path: string) => {
         if (path === "/company/manager") return "Dashboard"
@@ -45,9 +51,9 @@ export default function CompanyManagerLayout({
         if (path.includes("/reports")) return "Reports"
         return "Company Manager"
     }
-
+ 
     const title = getPageTitle(pathname)
-
+ 
     return (
         <div className="flex min-h-screen bg-muted/20 relative">
             {/* Sidebar with fixed positioning */}
@@ -57,7 +63,7 @@ export default function CompanyManagerLayout({
                 setCollapsed={setCollapsed}
                 title="FinShield"
             />
-
+ 
             {/* Main content wrapper */}
             <div
                 className={cn(
@@ -75,6 +81,7 @@ export default function CompanyManagerLayout({
                             { title: "Invoice Flagged", time: "10m ago", message: "INV-004 has been flagged as Flagged." },
                             { title: "Review Complete", time: "1h ago", message: "INV-003 verified successfully." }
                         ]}
+                        onMenuClick={() => setCollapsed(false)}
                     />
                 </div>
 

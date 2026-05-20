@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { AppSidebar, NavLink } from "@/components/layout/AppSidebar"
 import { TopBar } from "@/components/layout/TopBar"
 import { usePathname } from "next/navigation"
@@ -14,7 +14,7 @@ import {
     AlertTriangle,
 } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
-
+ 
 const regulatorLinks: NavLink[] = [
     { href: "/admin/regulator", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/regulator/invoices", label: "Invoices", icon: FileText },
@@ -23,15 +23,21 @@ const regulatorLinks: NavLink[] = [
     { href: "/admin/regulator/policy", label: "Policy", icon: Shield },
     { href: "/admin/regulator/terms", label: "Terms", icon: ScrollText },
 ]
-
+ 
 export default function RegulatorLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
     const pathname = usePathname()
-    const [collapsed, setCollapsed] = useState(false)
+    const [collapsed, setCollapsed] = useState(true)
     const { user } = useAuth()
+ 
+    useEffect(() => {
+        if (window.innerWidth >= 768) {
+            setCollapsed(false)
+        }
+    }, [])
 
     // Determine title based on path
     const getPageTitle = (path: string) => {
