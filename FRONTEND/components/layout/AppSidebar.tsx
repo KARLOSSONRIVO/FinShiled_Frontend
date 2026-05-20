@@ -179,6 +179,14 @@ export function AppSidebar({ links, collapsed, setCollapsed, title = "FinShield"
                                         <span className="font-bold text-xl tracking-tight text-sidebar-foreground truncate">{title}</span>
                                     </div>
                                 </div>
+                                <div className="flex items-center gap-1 shrink-0 absolute right-4">
+                                    <button
+                                        onClick={() => setCollapsed(true)}
+                                        className="p-1.5 rounded-full hover:bg-sidebar-accent/50 transition-colors text-sidebar-foreground"
+                                    >
+                                        <ChevronLeft className="h-5 w-5" />
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Navigation Links */}
