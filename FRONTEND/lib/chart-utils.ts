@@ -284,3 +284,118 @@ export function groupInvoicesByKey(
     return real.length > 0 ? real : all
 }
 
+// --- ReportDataPoint ----------------------------------------------------------
+
+export type ReportDataPoint = {
+    label: string       // "Jan" | "2023" etc.
+    approved: number
+    pending: number
+    rejected: number
+    value: number       // sum of invoice.amount ?? invoice.totalAmount
+}
+
+// --- groupInvoicesForReports --------------------------------------------------
+// Groups invoices into buckets for the charts based on the selected period and range.
+
+export function groupInvoicesForReports(
+    invoices: InvoiceBase[],
+    mode: "weekly" | "monthly" | "yearly",
+    numUnits: number = 6
+): ReportDataPoint[] {
+    const now = new Date()
+
+    if (mode === "weekly") {
+        const buckets: ReportDataPoint[] = Array.from({ length: numUnits }, (_, i) => ({
+            label: numUnits === 1 ? "This Week" : `Week ${i + 1}`,
+            approved: 0, pending: 0, rejected: 0, value: 0,
+        }))
+        for (const inv of invoices) {
+            const d = getDate(inv)
+            // Dateless invoices fall into the current (rightmost) bucket
+            const daysAgo = d ? Math.floor((now.getTime() - d.getTime()) / 86_400_000) : 0
+            if (daysAgo < 0 || daysAgo >= numUnits * 7) continue
+            const idx = numUnits - 1 - Math.floor(daysAgo / 7)
+            const bucket = buckets[idx]
+            const amount = Number((inv as any).amount ?? (inv as any).totalAmount ?? 0)
+            if (isClean(inv)) bucket.approved++
+            else if (isFlagged(inv)) bucket.rejected++
+            else bucket.pending++
+            bucket.value += amount
+        }
+        return buckets
+    }
+
+    if (mode === "monthly") {
+        const months: ReportDataPoint[] = []
+        for (let i = numUnits - 1; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+            months.push({
+                label: d.toLocaleString("default", { month: "short" }),
+                approved: 0, pending: 0, rejected: 0, value: 0,
+            })
+        }
+
+        for (const inv of invoices) {
+            const d = getDate(inv)
+            const diff = d
+                ? (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth()
+                : 0
+            if (diff < 0 || diff >= numUnits) continue
+            const bucket = months[numUnits - 1 - diff]
+            const amount = Number((inv as any).amount ?? (inv as any).totalAmount ?? 0)
+
+            if (isClean(inv)) bucket.approved++
+            else if (isFlagged(inv)) bucket.rejected++
+            else bucket.pending++
+            bucket.value += amount
+        }
+        return months
+    }
+
+    // yearly
+    const years: ReportDataPoint[] = []
+    for (let i = numUnits - 1; i >= 0; i--) {
+        years.push({
+            label: String(now.getFullYear() - i),
+            approved: 0, pending: 0, rejected: 0, value: 0,
+        })
+    }
+
+    for (const inv of invoices) {
+        const d = getDate(inv)
+        const diff = d ? now.getFullYear() - d.getFullYear() : 0
+        if (diff < 0 || diff >= numUnits) continue
+        const bucket = years[numUnits - 1 - diff]
+        const amount = Number((inv as any).amount ?? (inv as any).totalAmount ?? 0)
+
+        if (isClean(inv)) bucket.approved++
+        else if (isFlagged(inv)) bucket.rejected++
+        else bucket.pending++
+        bucket.value += amount
+    }
+    return years
+}
+
+export function filterInvoicesByPeriod<T extends InvoiceBase>(
+    invoices: T[],
+    mode: "weekly" | "monthly" | "yearly",
+    numUnits: number = 6
+): T[] {
+    const now = new Date()
+    return invoices.filter(inv => {
+        const d = getDate(inv)
+        if (!d) return true // Dateless invoices fallback to current period
+
+        if (mode === "weekly") {
+            const daysAgo = Math.floor((now.getTime() - d.getTime()) / 86_400_000)
+            return daysAgo >= 0 && daysAgo < numUnits * 7
+        } else if (mode === "monthly") {
+            const diff = (now.getFullYear() - d.getFullYear()) * 12 + now.getMonth() - d.getMonth()
+            return diff >= 0 && diff < numUnits
+        } else {
+            // yearly
+            const diff = now.getFullYear() - d.getFullYear()
+            return diff >= 0 && diff < numUnits
+        }
+    })
+}

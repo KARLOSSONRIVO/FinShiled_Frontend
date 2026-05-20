@@ -10,6 +10,7 @@ import {
     FileText,
     AlertTriangle,
     Link2,
+    FileBarChart,
 } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
 
@@ -18,6 +19,7 @@ const auditorLinks: NavLink[] = [
     { href: "/admin/auditor/invoices", label: "All Invoices", icon: FileText },
     { href: "/admin/auditor/flagged", label: "Flagged Queue", icon: AlertTriangle },
     { href: "/admin/auditor/pending", label: "Pending Queue", icon: AlertTriangle },
+    { href: "/admin/auditor/reports", label: "Reports", icon: FileBarChart },
     { href: "/admin/auditor/blockchain", label: "Blockchain Ledger", icon: Link2 },
 ]
 
@@ -36,6 +38,7 @@ export default function AuditorLayout({
         if (path.includes("/invoices")) return "Invoice Auditing"
         if (path.includes("/flagged")) return "Flagged Queue"
         if (path.includes("/pending")) return "Pending Queue"
+        if (path.includes("/reports")) return "Reports"
         if (path.includes("/blockchain")) return "Blockchain Ledger"
         if (path.includes("/settings")) return "Profile Management"
         return "FinShield Auditor"
