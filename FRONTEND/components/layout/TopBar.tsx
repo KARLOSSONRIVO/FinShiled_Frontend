@@ -149,18 +149,18 @@ export function TopBar({
                                     <AlertTriangle className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 text-amber-400" strokeWidth={2.5} />
                                 )}
                             </div>
-                            <div className="flex flex-col items-start justify-center h-8 text-sm">
-                                {userName || user?.username ? (
-                                    <span className="font-semibold leading-none">{displayUserName}</span>
-                                ) : (
-                                    <Skeleton className="h-4 w-24 mb-1.5" />
-                                )}
-                                {organizationName || user?.role ? (
-                                    <span className="text-xs text-muted-foreground leading-none mt-0.5">{displayRole}</span>
-                                ) : (
-                                    <Skeleton className="h-3 w-16" />
-                                )}
-                            </div>
+                        <div className="flex flex-col items-start justify-center h-8 text-sm min-w-0 max-w-[140px]">
+                            {userName || user?.username ? (
+                                <span className="font-semibold leading-none truncate w-full">{displayUserName}</span>
+                            ) : (
+                                <Skeleton className="h-4 w-24 mb-1.5" />
+                            )}
+                            {organizationName || user?.role ? (
+                                <span className="text-xs text-muted-foreground leading-none mt-0.5 truncate w-full">{displayRole}</span>
+                            ) : (
+                                <Skeleton className="h-3 w-16" />
+                            )}
+                        </div>
                             <ChevronUp className="h-3 w-3 text-muted-foreground ml-2 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         </Button>
                     </DropdownMenuTrigger>
