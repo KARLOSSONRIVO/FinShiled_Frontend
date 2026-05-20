@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
-import { Drawer, DrawerContent } from "@/components/ui/drawer"
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer"
 import {
     LayoutDashboard,
     Users,
@@ -166,6 +166,7 @@ export function AppSidebar({ links, collapsed, setCollapsed, title = "FinShield"
                     direction="left"
                 >
                     <DrawerContent className="h-screen w-[280px] bg-sidebar text-sidebar-foreground border-r border-border p-0 rounded-none">
+                        <DrawerTitle className="sr-only">Navigation Menu</DrawerTitle>
                         <div className="h-full flex flex-col">
                             {/* Header */}
                             <div className="h-20 flex shrink-0 items-center pl-[20px] pr-4 border-b border-border relative">
