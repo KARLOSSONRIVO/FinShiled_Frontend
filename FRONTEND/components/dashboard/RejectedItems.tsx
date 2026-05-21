@@ -34,7 +34,7 @@ export default function RejectedItems({ invoices }: RejectedItemsProps) {
                                             <XCircle className="h-6 w-6" />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-base">{invoice.invoiceNumber || "Unknown"}</p>
+                                            <p className="font-bold text-base">{!invoice.invoiceNumber || String(invoice.invoiceNumber).trim().toLowerCase() === 'n/a' || String(invoice.invoiceNumber).trim() === '—' ? 'Invalid Number' : invoice.invoiceNumber}</p>
                                             <p className="text-sm text-muted-foreground">
                                                 {invoice.uploadedAt ? new Date(invoice.uploadedAt).toLocaleDateString() : "—"}
                                             </p>

@@ -54,7 +54,7 @@ export function RecentInvoices({ invoices, title = "Recent Invoices", descriptio
                                             <FileText className="h-5 w-5 text-white" />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-base">{invoice.invoiceNumber || "—"}</p>
+                                            <p className="font-bold text-base">{!invoice.invoiceNumber || String(invoice.invoiceNumber).trim().toLowerCase() === 'n/a' || String(invoice.invoiceNumber).trim() === '—' ? 'Invalid Number' : invoice.invoiceNumber}</p>
                                             <p className="text-xs font-medium text-muted-foreground">{invoice.companyName || "—"}</p>
                                         </div>
                                     </div>

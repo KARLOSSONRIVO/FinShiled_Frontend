@@ -24,18 +24,18 @@ export function BlockchainTable({ invoices, sortBy, order, onSort }: BlockchainT
             <Table>
                 <TableHeader>
                     <TableRow className="hover:bg-transparent border-b border-border/50">
-                        <TableHead className="px-6 py-4">
+                        <TableHead className="px-6 py-4 text-center">
                             <div
-                                className="flex items-center justify-start gap-2 cursor-pointer font-bold text-base text-foreground"
+                                className="flex items-center justify-center gap-2 cursor-pointer font-bold text-base text-foreground"
                             >
                                 Invoice No.
                             </div>
                         </TableHead>
-                        <TableHead className="px-6 py-4 text-foreground font-bold text-base">Company</TableHead>
-                        <TableHead className="px-6 py-4 text-foreground font-bold text-base">Transaction Hash</TableHead>
-                        <TableHead className="px-6 py-4">
+                        <TableHead className="px-6 py-4 text-foreground font-bold text-base text-center">Company</TableHead>
+                        <TableHead className="px-6 py-4 text-foreground font-bold text-base text-center">Transaction Hash</TableHead>
+                        <TableHead className="px-6 py-4 text-center">
                             <div
-                                className="flex items-center justify-start gap-2 cursor-pointer font-bold text-base text-foreground"
+                                className="flex items-center justify-center gap-2 cursor-pointer font-bold text-base text-foreground"
                                 onClick={() => onSort?.("anchoredAt")}
                             >
                                 Anchored At
@@ -55,16 +55,16 @@ export function BlockchainTable({ invoices, sortBy, order, onSort }: BlockchainT
                     ) : (
                         invoices.map((row) => (
                             <TableRow key={row.id || (row as any)._id} className="h-20 hover:bg-muted/30 transition-colors border-b border-border/50">
-                                <TableCell className="px-6 font-bold text-base text-foreground">
-                                    {row.invoiceNumber || '—'}
+                                <TableCell className="px-6 text-center font-bold text-base text-foreground">
+                                    {!row.invoiceNumber || String(row.invoiceNumber).trim().toLowerCase() === 'n/a' || String(row.invoiceNumber).trim() === '—' ? 'Invalid Number' : row.invoiceNumber}
                                 </TableCell>
-                                <TableCell className="px-6 font-bold text-base text-foreground">
+                                <TableCell className="px-6 text-center font-bold text-base text-foreground">
                                     {row.company || '—'}
                                 </TableCell>
-                                <TableCell className="px-6 text-sm text-muted-foreground max-w-[220px] truncate">
+                                <TableCell className="px-6 text-center text-sm text-muted-foreground max-w-[220px] truncate mx-auto">
                                     {row.transactionHash || "—"}
                                 </TableCell>
-                                <TableCell className="px-6 font-bold text-base text-foreground">
+                                <TableCell className="px-6 text-center font-bold text-base text-foreground">
                                     {row.anchoredAt ? new Date(row.anchoredAt).toLocaleString() : "—"}
                                 </TableCell>
                                 <TableCell className="px-6 text-center">

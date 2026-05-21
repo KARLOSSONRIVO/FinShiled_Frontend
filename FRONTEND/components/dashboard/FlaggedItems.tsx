@@ -45,6 +45,15 @@ export function FlaggedItems({ invoices }: FlaggedItemsProps) {
                             const finalBadgeClassName = statusInfo ? statusInfo.className : badgeColor;
                             const statusText = statusInfo ? statusInfo.text : (invoice.status || '').toUpperCase();
 
+                            const getNum = (num1?: string, num2?: string) => {
+                                const n1 = String(num1 || '').trim();
+                                if (n1 && n1.toLowerCase() !== 'n/a' && n1 !== '—') return n1;
+                                const n2 = String(num2 || '').trim();
+                                if (n2 && n2.toLowerCase() !== 'n/a' && n2 !== '—') return n2;
+                                return 'Invalid Number';
+                            };
+                            const displayNum = getNum(invoice.invoiceNumber, invoice.invoiceNo);
+
                             return (
                                 <div
                                     key={invoice.id || invoice._id}
@@ -55,7 +64,7 @@ export function FlaggedItems({ invoices }: FlaggedItemsProps) {
                                             <AlertTriangle className="h-6 w-6" />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-base">Flagged {invoice.invoiceNumber || invoice.invoiceNo}</p>
+                                            <p className="font-bold text-base">Flagged {displayNum}</p>
                                             <p className="text-sm text-muted-foreground">{invoice.companyName}</p>
                                         </div>
                                     </div>

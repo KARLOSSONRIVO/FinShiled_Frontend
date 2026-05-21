@@ -51,14 +51,14 @@ export function ManagerStats({ totalInvoices, flaggedCount, employeeCount, total
     })}`
  
     return (
-        <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-[repeat(24,minmax(0,1fr))] gap-6 mb-8">
             {renderCard(
                 "Total Invoices",
                 totalInvoices.toLocaleString(),
                 <FileText className="h-7 w-7" />,
                 "text-[#3b5998]",
                 "bg-[#3b5998]",
-                "md:col-span-3 lg:col-span-3"
+                "md:col-span-2 lg:col-span-5"
             )}
             {renderCard(
                 "Flagged Items",
@@ -66,7 +66,7 @@ export function ManagerStats({ totalInvoices, flaggedCount, employeeCount, total
                 <AlertTriangle className="h-7 w-7" />,
                 "text-red-500",
                 "bg-red-500",
-                "md:col-span-3 lg:col-span-3"
+                "md:col-span-2 lg:col-span-5"
             )}
             {renderCard(
                 "Active Employees",
@@ -74,7 +74,7 @@ export function ManagerStats({ totalInvoices, flaggedCount, employeeCount, total
                 <Users className="h-7 w-7" />,
                 "text-amber-500",
                 "bg-amber-500",
-                "md:col-span-3 lg:col-span-2"
+                "md:col-span-2 lg:col-span-5"
             )}
             {renderCard(
                 "Invoice Volume",
@@ -82,7 +82,7 @@ export function ManagerStats({ totalInvoices, flaggedCount, employeeCount, total
                 <CheckCircle className="h-7 w-7" />,
                 "text-emerald-500",
                 "bg-emerald-500",
-                "md:col-span-3 lg:col-span-4"
+                "md:col-span-6 lg:col-span-9"
             )}
         </div>
     )

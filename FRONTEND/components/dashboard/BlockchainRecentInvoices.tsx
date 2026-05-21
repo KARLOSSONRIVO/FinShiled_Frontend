@@ -111,7 +111,7 @@ export function BlockchainRecentInvoices() {
                                         <Blocks className="h-5 w-5 text-white" />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-base">{invoice.invoiceNumber || "—"}</p>
+                                        <p className="font-bold text-base">{!invoice.invoiceNumber || String(invoice.invoiceNumber).trim().toLowerCase() === 'n/a' || String(invoice.invoiceNumber).trim() === '—' ? 'Invalid Number' : invoice.invoiceNumber}</p>
                                         <p className="text-xs font-medium text-muted-foreground">
                                             {invoice.companyName || truncateHash(invoice.fromAddress || invoice.id)}
                                         </p>
