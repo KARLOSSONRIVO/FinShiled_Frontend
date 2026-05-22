@@ -163,9 +163,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error: any) {
             // Silently fail logout if token is already bad, user is being redirected anyway
         } finally {
+            // Clear all sensitive user session items
             localStorage.removeItem("token")
             localStorage.removeItem("refreshToken")
             localStorage.removeItem("user")
+
+            // Clear all FinShield cached layouts, filter inputs, and query caches
+            if (typeof window !== "undefined") {
+                for (let i = localStorage.length - 1; i >= 0; i--) {
+                    const key = localStorage.key(i)
+                    if (key && (key.startsWith("finshield_") || key.startsWith("FINSHIELD_"))) {
+                        localStorage.removeItem(key)
+                    }
+                }
+            }
 
             // Remove cookie
             document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"

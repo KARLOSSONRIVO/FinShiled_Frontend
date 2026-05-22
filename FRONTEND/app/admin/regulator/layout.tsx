@@ -14,7 +14,8 @@ import {
     AlertTriangle,
 } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
- 
+import { usePersistedSidebar } from "@/hooks/global/use-persisted-sidebar"
+
 const regulatorLinks: NavLink[] = [
     { href: "/admin/regulator", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/regulator/invoices", label: "Invoices", icon: FileText },
@@ -30,14 +31,8 @@ export default function RegulatorLayout({
     children: React.ReactNode
 }) {
     const pathname = usePathname()
-    const [collapsed, setCollapsed] = useState(true)
+    const [collapsed, setCollapsed] = usePersistedSidebar("finshield_sidebar_regulator_collapsed")
     const { user } = useAuth()
- 
-    useEffect(() => {
-        if (window.innerWidth >= 768) {
-            setCollapsed(false)
-        }
-    }, [])
 
     // Determine title based on path
     const getPageTitle = (path: string) => {

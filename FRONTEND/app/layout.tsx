@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { SocketProvider } from "@/providers/socket-provider"
 import { GlobalSocketListeners } from "@/components/global/GlobalSocketListeners"
 import { GlobalPasswordChange } from "@/components/global/GlobalPasswordChange"
+import { OfflineBanner } from "@/components/global/OfflineBanner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -43,6 +44,7 @@ export default function RootLayout({
               <SocketProvider>
                 <GlobalSocketListeners />
                 <GlobalPasswordChange />
+                <OfflineBanner />
                 {children}
               </SocketProvider>
             </AuthProvider>

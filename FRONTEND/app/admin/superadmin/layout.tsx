@@ -19,6 +19,7 @@ import {
     FileBarChart,
 } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
+import { usePersistedSidebar } from "@/hooks/global/use-persisted-sidebar"
  
 const superAdminLinks: NavLink[] = [
     { href: "/admin/superadmin", label: "Dashboard", icon: LayoutDashboard },
@@ -40,14 +41,8 @@ export default function SuperAdminLayout({
     children: React.ReactNode
 }) {
     const pathname = usePathname()
-    const [collapsed, setCollapsed] = useState(true)
+    const [collapsed, setCollapsed] = usePersistedSidebar("finshield_sidebar_superadmin_collapsed")
     const { user } = useAuth()
- 
-    useEffect(() => {
-        if (window.innerWidth >= 768) {
-            setCollapsed(false)
-        }
-    }, [])
 
     // Determine title based on path
     const getPageTitle = (path: string) => {

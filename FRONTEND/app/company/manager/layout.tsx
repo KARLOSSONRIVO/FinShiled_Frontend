@@ -15,7 +15,8 @@ import {
     ScrollText
 } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
- 
+import { usePersistedSidebar } from "@/hooks/global/use-persisted-sidebar"
+
 const managerLinks: NavLink[] = [
     { href: "/company/manager", label: "Dashboard", icon: LayoutDashboard },
     { href: "/company/manager/upload", label: "Upload Invoice", icon: Upload },
@@ -31,15 +32,9 @@ export default function CompanyManagerLayout({
     children: React.ReactNode
 }) {
     const pathname = usePathname()
-    const [collapsed, setCollapsed] = useState(true)
+    const [collapsed, setCollapsed] = usePersistedSidebar("finshield_sidebar_manager_collapsed")
  
     const { user } = useAuth()
- 
-    useEffect(() => {
-        if (window.innerWidth >= 768) {
-            setCollapsed(false)
-        }
-    }, [])
  
     // Determine title based on path
     const getPageTitle = (path: string) => {

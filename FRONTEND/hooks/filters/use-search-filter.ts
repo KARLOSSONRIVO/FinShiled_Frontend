@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
+import { useState, useMemo, useCallback, useEffect } from "react"
 
 interface UseSearchFilterOptions<T> {
     items: T[]
     searchFields: (keyof T)[]
     statusField?: keyof T
     defaultStatus?: string
+    storageKey?: string
 }
 
 interface UseSearchFilterReturn<T> {
@@ -25,9 +26,33 @@ export function useSearchFilter<T extends Record<string, any>>({
     searchFields,
     statusField,
     defaultStatus = "all",
+    storageKey,
 }: UseSearchFilterOptions<T>): UseSearchFilterReturn<T> {
-    const [search, setSearch] = useState("")
-    const [statusFilter, setStatusFilter] = useState(defaultStatus)
+    const [search, setSearchState] = useState("")
+    const [statusFilter, setStatusFilterState] = useState(defaultStatus)
+
+    useEffect(() => {
+        if (storageKey) {
+            const savedSearch = localStorage.getItem(`${storageKey}_search`)
+            const savedStatus = localStorage.getItem(`${storageKey}_status`)
+            if (savedSearch !== null) setSearchState(savedSearch)
+            if (savedStatus !== null) setStatusFilterState(savedStatus)
+        }
+    }, [storageKey])
+
+    const setSearch = useCallback((val: string) => {
+        setSearchState(val)
+        if (storageKey) {
+            localStorage.setItem(`${storageKey}_search`, val)
+        }
+    }, [storageKey])
+
+    const setStatusFilter = useCallback((val: string) => {
+        setStatusFilterState(val)
+        if (storageKey) {
+            localStorage.setItem(`${storageKey}_status`, val)
+        }
+    }, [storageKey])
 
     const filteredItems = useMemo(() => {
         return items.filter((item) => {
@@ -57,9 +82,13 @@ export function useSearchFilter<T extends Record<string, any>>({
     }, [items, search, statusFilter, searchFields, statusField, defaultStatus])
 
     const clearFilters = useCallback(() => {
-        setSearch("")
-        setStatusFilter(defaultStatus)
-    }, [defaultStatus])
+        setSearchState("")
+        setStatusFilterState(defaultStatus)
+        if (storageKey) {
+            localStorage.removeItem(`${storageKey}_search`)
+            localStorage.removeItem(`${storageKey}_status`)
+        }
+    }, [defaultStatus, storageKey])
 
     const hasActiveFilters = search !== "" || statusFilter !== defaultStatus
 
@@ -78,21 +107,23 @@ export function useSearchFilter<T extends Record<string, any>>({
 // Convenience hook for invoice filtering (commonly used pattern)
 export function useInvoiceFilter<
     T extends { invoiceNo: string; status: string }
->(invoices: T[]) {
+>(invoices: T[], storageKey = "finshield_invoice_filter") {
     return useSearchFilter({
         items: invoices,
         searchFields: ["invoiceNo"],
         statusField: "status",
+        storageKey,
     })
 }
 
 // Convenience hook for user filtering
 export function useUserFilter<
     T extends { username: string; email: string; role?: string }
->(users: T[]) {
+>(users: T[], storageKey = "finshield_user_filter") {
     return useSearchFilter({
         items: users,
         searchFields: ["username", "email"],
         statusField: "role",
+        storageKey,
     })
 }
