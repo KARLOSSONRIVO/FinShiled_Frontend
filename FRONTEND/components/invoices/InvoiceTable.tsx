@@ -11,7 +11,7 @@ import { ChevronUp, ChevronDown, Loader2 } from "lucide-react"
 import { DataPagination } from "../common/DataPagination"
 import { Skeleton } from "@/components/ui/skeleton"
 
-export type TableViewMode = "super-admin" | "auditor" | "regulator" | "manager" | "employee"
+export type TableViewMode = "superadmin" | "external-auditor" | "regulator" | "manager" | "employee"
 
 // Extended types to include all possible fields
 interface ExtendedListInvoice extends ListInvoice {
@@ -66,7 +66,7 @@ const showCompany = (mode: TableViewMode) => mode !== "manager" && mode !== "emp
 
 export function InvoiceTable({ invoices, mode, baseUrl, pagination, onPageChange, sortBy, order, onSort }: InvoiceTableProps) {
     const isEmployee = mode === "employee"
-    const showOrgColumn = mode === "super-admin" || mode === "regulator"
+    const showOrgColumn = mode === "superadmin" || mode === "regulator"
 
     // Function to get the best available organization/company name
     const getOrganizationName = (row: AnyInvoice): string => {

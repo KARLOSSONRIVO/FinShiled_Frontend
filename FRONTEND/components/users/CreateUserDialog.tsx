@@ -102,7 +102,7 @@ export function CreateUserDialog({
                                 <SelectValue placeholder="Select Role" />
                             </SelectTrigger>
                             <SelectContent className="border border-black rounded-lg">
-                                <SelectItem value="AUDITOR">Auditor</SelectItem>
+                                <SelectItem value="AUDITOR">External Auditor</SelectItem>
                                 <SelectItem value="REGULATOR">Regulator</SelectItem>
                                 <SelectItem value="COMPANY_MANAGER">Company Manager</SelectItem>
                             </SelectContent>

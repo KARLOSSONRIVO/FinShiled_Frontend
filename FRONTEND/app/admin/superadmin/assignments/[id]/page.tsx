@@ -100,7 +100,7 @@ export default function AssignmentDetailPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4">
-                <Link href="/admin/super-admin/assignments">
+                <Link href="/admin/superadmin/assignments">
                     <Button variant="ghost" size="icon" className="rounded-full">
                         <ArrowLeft className="h-5 w-5" />
                     </Button>

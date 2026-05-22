@@ -33,13 +33,13 @@ export default function AssignmentsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-normal tracking-tight">Auditor Assignments</h2>
+        <h2 className="text-2xl font-normal tracking-tight">External Auditor Assignments</h2>
         <Button
           className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-medium"
           onClick={() => setIsCreateOpen(true)}
         >
           <Plus className="h-4 w-4" />
-          Add Auditor
+          Add External Auditor
         </Button>
       </div>
 

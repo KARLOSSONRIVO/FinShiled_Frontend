@@ -52,7 +52,7 @@ export default function AuditorReportsPage() {
     <div className="space-y-6">
       {/* Page title — plain text, no icon, no bold */}
       <h1 className="text-2xl font-normal tracking-tight text-foreground/90">
-        Auditor Reports
+        External Auditor Reports
       </h1>
 
       <div className="space-y-6 w-full">
@@ -73,7 +73,7 @@ export default function AuditorReportsPage() {
           />
           <ReportDownloadMenu
             invoices={filteredInvoicesForDownload}
-            filename={`auditor-report-${periodLabel.toLowerCase().replace(/ /g, "-")}`}
+            filename={`external-auditor-report-${periodLabel.toLowerCase().replace(/ /g, "-")}`}
           />
         </div>
 

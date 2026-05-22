@@ -73,8 +73,8 @@ export default function FlaggedQueuePage() {
         ) : (
           <InvoiceTable
             invoices={invoices}
-            mode="super-admin"
-            baseUrl="/admin/super-admin/invoices"
+            mode="superadmin"
+            baseUrl="/admin/superadmin/invoices"
           />
         )}
       </div>

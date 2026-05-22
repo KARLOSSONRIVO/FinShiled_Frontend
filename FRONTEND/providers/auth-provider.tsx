@@ -194,10 +194,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         switch (user.role) {
             case "SUPER_ADMIN":
-                router.push("/admin/super-admin")
+                router.push("/admin/superadmin")
                 break
             case "AUDITOR":
-                router.push("/admin/auditor")
+                router.push("/admin/external-auditor")
                 break
             case "REGULATOR":
                 router.push("/admin/regulator")

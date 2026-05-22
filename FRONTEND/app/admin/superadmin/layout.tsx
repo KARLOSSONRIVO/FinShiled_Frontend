@@ -21,17 +21,17 @@ import {
 import { useAuth } from "@/hooks/global/use-auth"
  
 const superAdminLinks: NavLink[] = [
-    { href: "/admin/super-admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/super-admin/organizations", label: "Organizations", icon: Building2 },
-    { href: "/admin/super-admin/users", label: "Platform Users", icon: Users },
-    { href: "/admin/super-admin/assignments", label: "Auditor Assignments", icon: UserPlus },
-    { href: "/admin/super-admin/invoices", label: "All Invoices", icon: FileText },
-    { href: "/admin/super-admin/flagged", label: "Flagged Queue", icon: AlertTriangle },
-    { href: "/admin/super-admin/reports", label: "Reports", icon: FileBarChart },
-    { href: "/admin/super-admin/blockchain", label: "Blockchain Ledger", icon: Link2 },
-    { href: "/admin/super-admin/audit-logs", label: "Audit Logs", icon: Monitor },
-    { href: "/admin/super-admin/policy", label: "Policy", icon: Shield },
-    { href: "/admin/super-admin/terms", label: "Terms", icon: ScrollText },
+    { href: "/admin/superadmin", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin/superadmin/organizations", label: "Organizations", icon: Building2 },
+    { href: "/admin/superadmin/users", label: "Platform Users", icon: Users },
+    { href: "/admin/superadmin/assignments", label: "External Auditor Assignments", icon: UserPlus },
+    { href: "/admin/superadmin/invoices", label: "All Invoices", icon: FileText },
+    { href: "/admin/superadmin/flagged", label: "Flagged Queue", icon: AlertTriangle },
+    { href: "/admin/superadmin/reports", label: "Reports", icon: FileBarChart },
+    { href: "/admin/superadmin/blockchain", label: "Blockchain Ledger", icon: Link2 },
+    { href: "/admin/superadmin/audit-logs", label: "Audit Logs", icon: Monitor },
+    { href: "/admin/superadmin/policy", label: "Policy", icon: Shield },
+    { href: "/admin/superadmin/terms", label: "Terms", icon: ScrollText },
 ]
  
 export default function SuperAdminLayout({
@@ -51,10 +51,10 @@ export default function SuperAdminLayout({
 
     // Determine title based on path
     const getPageTitle = (path: string) => {
-        if (path === "/admin/super-admin") return "Dashboard"
+        if (path === "/admin/superadmin") return "Dashboard"
         if (path.includes("/organizations")) return "Organization Management"
         if (path.includes("/users")) return "Platform Users"
-        if (path.includes("/assignments")) return "Auditor Assignments"
+        if (path.includes("/assignments")) return "External Auditor Assignments"
         if (path.includes("/invoices")) return "All Invoices"
         if (path.includes("/flagged")) return "Flagged Queue"
         if (path.includes("/reports")) return "Platform Reports"
@@ -62,7 +62,7 @@ export default function SuperAdminLayout({
         if (path.includes("/audit-logs")) return "Audit Logs"
         if (path.includes("/policy")) return "Policy Management"
         if (path.includes("/terms")) return "Terms Management"
-        return "FinShield Admin"
+        return "FinShield Superadmin"
     }
 
     const title = getPageTitle(pathname)
@@ -88,7 +88,7 @@ export default function SuperAdminLayout({
                 <div className="sticky top-0 z-40">
                     <TopBar
                         title={title}
-                        profileLink="/admin/super-admin/settings"
+                        profileLink="/admin/superadmin/settings"
                         notifications={[
                             { title: "New Fraud Alert", time: "2m ago", message: "Invoice INV-2024-100 tagged for review." },
                             { title: "New Fraud Alert", time: "5m ago", message: "Invoice INV-2024-101 tagged for review." }

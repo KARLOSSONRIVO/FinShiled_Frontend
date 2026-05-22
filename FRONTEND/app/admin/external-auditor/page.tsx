@@ -110,7 +110,7 @@ export default function AuditorDashboard() {
         <>
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-bold tracking-tight">
-              Welcome back, <span className="text-emerald-600">{user?.username || "Auditor"}</span>
+              Welcome back, <span className="text-emerald-600">{user?.username || "External Auditor"}</span>
             </h2>
             <p className="text-muted-foreground">
               Review Activity Overview{" "}

@@ -184,7 +184,7 @@ export function InvoiceDetails({ invoice }: { invoice: any }) {
                     <CardContent className="space-y-4 pt-4">
                         <div className="border border-border rounded-lg p-4 bg-card">
                             <div className="flex justify-between items-start mb-2">
-                                <span className="font-bold text-sm">Auditor 1</span>
+                                <span className="font-bold text-sm">External Auditor 1</span>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" className="h-6 w-6 p-0 hover:bg-muted">

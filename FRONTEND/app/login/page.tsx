@@ -58,8 +58,8 @@ export default function LoginPage() {
     if (!user) return
 
     const roleRoutes: Record<string, string> = {
-      SUPER_ADMIN: "/admin/super-admin",
-      AUDITOR: "/admin/auditor",
+      SUPER_ADMIN: "/admin/superadmin",
+      AUDITOR: "/admin/external-auditor",
       REGULATOR: "/admin/regulator",
       COMPANY_MANAGER: "/company/manager",
       COMPANY_USER: "/company/employee",

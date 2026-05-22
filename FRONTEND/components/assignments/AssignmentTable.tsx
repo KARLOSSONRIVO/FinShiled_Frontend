@@ -88,7 +88,7 @@ export function AssignmentTableContent({ assignments, onDelete, onUpdate, compan
     const getCompanyName = (orgId: string) => companies.find((c: any) => c.id === orgId || c._id === orgId)?.name || "Unknown Company"
     const getAuditorName = (userId: string) => {
         const user = auditors.find((u: any) => u.id === userId || u._id === userId)
-        return user ? `${user.firstName} ${user.lastName}` : "Unknown Auditor"
+        return user ? `${user.firstName} ${user.lastName}` : "Unknown External Auditor"
     }
 
     return (
@@ -101,7 +101,7 @@ export function AssignmentTableContent({ assignments, onDelete, onUpdate, compan
                                 Company
                             </TableHead>
                             <TableHead className="px-6 py-4 text-center text-foreground font-bold text-base">
-                                Auditor
+                                External Auditor
                             </TableHead>
                             <TableHead className="px-6 py-4">
                                 <div className="flex items-center justify-center gap-2 cursor-pointer font-bold text-base text-foreground" onClick={() => onSort?.("status")}>
@@ -210,7 +210,7 @@ export function AssignmentTableContent({ assignments, onDelete, onUpdate, compan
                     <AlertDialogHeader className="border-b pb-4">
                         <AlertDialogTitle>Change Assignment Status</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to {pendingStatusChange?.newStatus === 'ACTIVE' ? 'enable' : 'disable'} the auditor assignment for <strong>{pendingStatusChange?.companyName}</strong>?
+                            Are you sure you want to {pendingStatusChange?.newStatus === 'ACTIVE' ? 'enable' : 'disable'} the external auditor assignment for <strong>{pendingStatusChange?.companyName}</strong>?
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

@@ -25,8 +25,8 @@ export function ErrorDisplay({
     const getHomePath = () => {
         if (!user) return "/"
         switch (user.role) {
-            case "SUPER_ADMIN": return "/admin/super-admin"
-            case "AUDITOR": return "/admin/auditor"
+            case "SUPER_ADMIN": return "/admin/superadmin"
+            case "AUDITOR": return "/admin/external-auditor"
             case "REGULATOR": return "/admin/regulator"
             case "COMPANY_MANAGER": return "/company/manager"
             case "COMPANY_USER": return "/company/employee"

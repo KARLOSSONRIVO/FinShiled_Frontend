@@ -214,7 +214,7 @@ export default function SuperAdminDashboard() {
                 />
                 <ApprovalRateDonut
                   data={approvalData}
-                  title={isCompanySelected ? `${company} — Approval Rate` : "Auditor Approval Rate"}
+                  title={isCompanySelected ? `${company} — Approval Rate` : "External Auditor Approval Rate"}
                 />
               </div>
 

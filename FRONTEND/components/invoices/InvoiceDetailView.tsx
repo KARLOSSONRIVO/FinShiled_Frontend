@@ -23,8 +23,8 @@ interface InvoiceDetailViewProps {
     id: string
     backUrl: string
     backLabel?: string
-    /** Pass "auditor" to show the Submit Review card instead of Review History */
-    role?: "auditor" | "super-admin" | "regulator" | "manager"
+    /** Pass "external-auditor" to show the Submit Review card instead of Review History */
+    role?: "external-auditor" | "superadmin" | "regulator" | "manager"
 }
 
 interface AiCompletePayload {
@@ -45,7 +45,7 @@ export function InvoiceDetailView({ id, backUrl, backLabel = "Back to Invoices",
     const socketCtx = useContext(SocketContext)
     const { mutate: submitReview, isPending: isSubmitting } = useSubmitReview(id)
 
-    const isAuditor = role === "auditor"
+    const isAuditor = role === "external-auditor"
 
     // Socket: refresh invoice on AI/blockchain events
     const handleInvoiceUpdate = useCallback((data: { invoiceId: string }) => {
@@ -634,13 +634,13 @@ export function InvoiceDetailView({ id, backUrl, backLabel = "Back to Invoices",
                             <ClipboardCheck className="h-5 w-5" />
                             Review Decision
                         </CardTitle>
-                        <CardDescription>Auditor decisions and notes</CardDescription>
+                        <CardDescription>External Auditor decisions and notes</CardDescription>
                     </CardHeader>
                     <CardContent>
                         {hasReview ? (
                             <div className="p-4 border border-border rounded-xl space-y-2">
                                 <div className="flex justify-between items-center">
-                                    <span className="font-bold text-sm">{data.review!.reviewer || "Auditor"}</span>
+                                    <span className="font-bold text-sm">{data.review!.reviewer || "External Auditor"}</span>
                                     <Badge className={`${data.review!.decision === "rejected" ? "bg-red-600" : "bg-emerald-600"} text-white text-[10px] capitalize rounded-md px-3 font-bold`}>
                                         {data.review!.decision === "approved" ? "Approved" : "Rejected"}
                                     </Badge>

@@ -57,8 +57,8 @@ export default function AuditorFlaggedPage() {
       ) : (
         <InvoiceTable
           invoices={invoices}
-          mode="auditor"
-          baseUrl="/admin/auditor/invoices"
+          mode="external-auditor"
+          baseUrl="/admin/external-auditor/invoices"
           sortBy={sortConfig?.key}
           order={sortConfig?.direction}
           onSort={requestSort}

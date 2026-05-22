@@ -45,7 +45,7 @@ export function CreateAssignmentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[400px] border border-black shadow-none rounded-xl flex flex-col" showCloseButton={false}>
         <DialogHeader className="flex flex-row items-center justify-between border-b pb-4">
-          <DialogTitle className="text-xl font-normal">Assign Auditor</DialogTitle>
+          <DialogTitle className="text-xl font-normal">Assign External Auditor</DialogTitle>
           <DialogClose className="opacity-70 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
             <X className="h-6 w-6" />
             <span className="sr-only">Close</span>
@@ -75,7 +75,7 @@ export function CreateAssignmentDialog({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="auditor" className="font-bold text-base">Auditor</Label>
+            <Label htmlFor="auditor" className="font-bold text-base">External Auditor</Label>
             <Select
               value={newAssignment.auditorUserId}
               onValueChange={(value) =>
@@ -83,7 +83,7 @@ export function CreateAssignmentDialog({
               }
             >
               <SelectTrigger id="auditor" className="border border-black rounded-lg h-11 w-full">
-                <SelectValue placeholder="Select auditor" />
+                <SelectValue placeholder="Select external auditor" />
               </SelectTrigger>
               <SelectContent className="border border-black rounded-lg">
                 {auditors.map((auditor) => (

@@ -58,7 +58,7 @@ export function EditAssignmentDialog({
         <DialogHeader>
           <DialogTitle>Edit Assignment</DialogTitle>
           <DialogDescription>
-            Update the status for this auditor assignment.
+            Update the status for this external auditor assignment.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -69,7 +69,7 @@ export function EditAssignmentDialog({
             </div>
           </div>
           <div className="grid gap-2">
-            <Label>Auditor</Label>
+            <Label>External Auditor</Label>
             <div className="p-2 border rounded-md bg-muted text-sm font-medium">
               {auditorName}
             </div>

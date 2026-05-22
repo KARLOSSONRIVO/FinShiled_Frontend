@@ -16,13 +16,13 @@ import {
 import { useAuth } from "@/hooks/global/use-auth"
  
 const auditorLinks: NavLink[] = [
-    { href: "/admin/auditor", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/auditor/upload", label: "Upload Invoice", icon: Upload },
-    { href: "/admin/auditor/invoices", label: "All Invoices", icon: FileText },
-    { href: "/admin/auditor/flagged", label: "Flagged Queue", icon: AlertTriangle },
-    { href: "/admin/auditor/pending", label: "Pending Queue", icon: AlertTriangle },
-    { href: "/admin/auditor/reports", label: "Reports", icon: FileBarChart },
-    { href: "/admin/auditor/blockchain", label: "Blockchain Ledger", icon: Link2 },
+    { href: "/admin/external-auditor", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin/external-auditor/upload", label: "Upload Invoice", icon: Upload },
+    { href: "/admin/external-auditor/invoices", label: "All Invoices", icon: FileText },
+    { href: "/admin/external-auditor/flagged", label: "Flagged Queue", icon: AlertTriangle },
+    { href: "/admin/external-auditor/pending", label: "Pending Queue", icon: AlertTriangle },
+    { href: "/admin/external-auditor/reports", label: "Reports", icon: FileBarChart },
+    { href: "/admin/external-auditor/blockchain", label: "Blockchain Ledger", icon: Link2 },
 ]
  
 export default function AuditorLayout({
@@ -42,7 +42,7 @@ export default function AuditorLayout({
 
     // Determine title based on path
     const getPageTitle = (path: string) => {
-        if (path === "/admin/auditor") return "Auditor Dashboard"
+        if (path === "/admin/external-auditor") return "External Auditor Dashboard"
         if (path.includes("/upload")) return "Upload Invoice"
         if (path.includes("/invoices")) return "Invoice Auditing"
         if (path.includes("/flagged")) return "Flagged Queue"
@@ -50,7 +50,7 @@ export default function AuditorLayout({
         if (path.includes("/reports")) return "Reports"
         if (path.includes("/blockchain")) return "Blockchain Ledger"
         if (path.includes("/settings")) return "Profile Management"
-        return "FinShield Auditor"
+        return "FinShield External Auditor"
     }
 
     const title = getPageTitle(pathname)
@@ -77,7 +77,7 @@ export default function AuditorLayout({
                     <TopBar
                         title={title}
                         userName={user?.username}
-                        profileLink="/admin/auditor/settings"
+                        profileLink="/admin/external-auditor/settings"
                         notifications={[
                             { title: "New Assignment", time: "1h ago", message: "You have been assigned to review Company 100." },
                             { title: "New Assignment", time: "2h ago", message: "You have been assigned to review Company 101." }
