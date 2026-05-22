@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 import {
     LayoutDashboard,
     FileText,
+    Upload,
     AlertTriangle,
     Link2,
     FileBarChart,
@@ -16,6 +17,7 @@ import { useAuth } from "@/hooks/global/use-auth"
  
 const auditorLinks: NavLink[] = [
     { href: "/admin/auditor", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin/auditor/upload", label: "Upload Invoice", icon: Upload },
     { href: "/admin/auditor/invoices", label: "All Invoices", icon: FileText },
     { href: "/admin/auditor/flagged", label: "Flagged Queue", icon: AlertTriangle },
     { href: "/admin/auditor/pending", label: "Pending Queue", icon: AlertTriangle },
@@ -41,6 +43,7 @@ export default function AuditorLayout({
     // Determine title based on path
     const getPageTitle = (path: string) => {
         if (path === "/admin/auditor") return "Auditor Dashboard"
+        if (path.includes("/upload")) return "Upload Invoice"
         if (path.includes("/invoices")) return "Invoice Auditing"
         if (path.includes("/flagged")) return "Flagged Queue"
         if (path.includes("/pending")) return "Pending Queue"
