@@ -5,6 +5,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 function Table({ className, ...props }: React.ComponentProps<'table'>) {
+  const hasMinWidth = className?.includes('min-w-')
   return (
     <div
       data-slot="table-container"
@@ -12,7 +13,7 @@ function Table({ className, ...props }: React.ComponentProps<'table'>) {
     >
       <table
         data-slot="table"
-        className={cn('w-full caption-bottom text-sm', className)}
+        className={cn('w-full caption-bottom text-sm', !hasMinWidth && 'min-w-[800px]', className)}
         {...props}
       />
     </div>

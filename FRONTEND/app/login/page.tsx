@@ -133,7 +133,7 @@ export default function LoginPage() {
   if (step === 'mfa') {
     return (
       <div className="h-screen w-full flex overflow-hidden">
-        <div className="w-full lg:w-1/2 h-full overflow-y-auto flex flex-col justify-center items-center px-8 md:px-16 lg:px-24 xl:px-32 py-8 bg-[#f5f5f0]">
+        <div className="w-full lg:w-1/2 h-full flex flex-col justify-center items-center px-8 md:px-16 lg:px-24 xl:px-32 py-8 bg-[#f5f5f0]">
           <div className="w-full max-w-md my-auto">
             <div className="mb-8 flex justify-center">
               <Link href="/">
@@ -216,7 +216,7 @@ export default function LoginPage() {
     <>
       <div className="h-screen w-full flex overflow-hidden">
         {/* Left Side - Login Form */}
-        <div className="w-full lg:w-1/2 h-full overflow-y-auto flex flex-col justify-center items-center px-8 md:px-16 lg:px-24 xl:px-32 py-8 bg-[#f5f5f0]">
+        <div className="w-full lg:w-1/2 h-full flex flex-col justify-center items-center px-8 md:px-16 lg:px-24 xl:px-32 py-8 bg-[#f5f5f0]">
           <div className="w-full max-w-md my-auto flex flex-col justify-center min-h-max">
             <div className="mb-8 flex justify-center shrink-0">
               <Link href="/">

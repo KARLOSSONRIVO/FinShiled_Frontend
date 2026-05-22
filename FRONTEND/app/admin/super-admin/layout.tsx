@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { AppSidebar, NavLink } from "@/components/layout/AppSidebar"
 import { TopBar } from "@/components/layout/TopBar"
 import { usePathname } from "next/navigation"
@@ -19,7 +19,7 @@ import {
     FileBarChart,
 } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
-
+ 
 const superAdminLinks: NavLink[] = [
     { href: "/admin/super-admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/super-admin/organizations", label: "Organizations", icon: Building2 },
@@ -33,15 +33,21 @@ const superAdminLinks: NavLink[] = [
     { href: "/admin/super-admin/policy", label: "Policy", icon: Shield },
     { href: "/admin/super-admin/terms", label: "Terms", icon: ScrollText },
 ]
-
+ 
 export default function SuperAdminLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
     const pathname = usePathname()
-    const [collapsed, setCollapsed] = useState(false)
+    const [collapsed, setCollapsed] = useState(true)
     const { user } = useAuth()
+ 
+    useEffect(() => {
+        if (window.innerWidth >= 768) {
+            setCollapsed(false)
+        }
+    }, [])
 
     // Determine title based on path
     const getPageTitle = (path: string) => {

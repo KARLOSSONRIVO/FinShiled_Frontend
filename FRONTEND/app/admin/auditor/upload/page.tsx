@@ -2,7 +2,7 @@
  
 import { UploadInvoiceForm } from "@/components/invoices/UploadInvoiceForm"
  
-export default function EmployeeUploadPage() {
+export default function AuditorUploadPage() {
   return (
     <div className="space-y-6">
       <div>

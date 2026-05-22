@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -56,14 +56,24 @@ export function AlertCardList({ title, description, invoices, type }: AlertCardL
                             No items found
                         </p>
                     ) : (
-                        invoices.slice(0, 3).map(invoice => (
-                            <div key={invoice.id || invoice._id} className={`flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm ${type !== 'pending' ? styles.border : ''}`}>
-                                <div>
-                                    <p className="font-bold text-sm">{invoice.invoiceNumber || invoice.invoiceNo}</p>
-                                    <Badge className={`mt-1 h-5 text-[10px] px-1.5 font-bold border-0 ${styles.badge}`}>
-                                        {type === 'flagged' ? 'Flagged' : 'Pending'}
-                                    </Badge>
-                                </div>
+                        invoices.slice(0, 3).map(invoice => {
+                            const getNum = (num1?: string, num2?: string) => {
+                                const n1 = String(num1 || '').trim();
+                                if (n1 && n1.toLowerCase() !== 'n/a' && n1 !== '—') return n1;
+                                const n2 = String(num2 || '').trim();
+                                if (n2 && n2.toLowerCase() !== 'n/a' && n2 !== '—') return n2;
+                                return 'Invalid Number';
+                            };
+                            const displayNum = getNum(invoice.invoiceNumber, invoice.invoiceNo);
+
+                            return (
+                                <div key={invoice.id || invoice._id} className={`flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm ${type !== 'pending' ? styles.border : ''}`}>
+                                    <div>
+                                        <p className="font-bold text-sm">{displayNum}</p>
+                                        <Badge className={`mt-1 h-5 text-[10px] px-1.5 font-bold border-0 ${styles.badge}`}>
+                                            {type === 'flagged' ? 'Flagged' : 'Pending'}
+                                        </Badge>
+                                    </div>
 
                                 {type === 'pending' && (
                                     <div className="text-sm text-muted-foreground">
@@ -76,7 +86,8 @@ export function AlertCardList({ title, description, invoices, type }: AlertCardL
                                     </Button>
                                 </Link>
                             </div>
-                        ))
+                            )
+                        })
                     )}
                 </div>
             </CardContent>

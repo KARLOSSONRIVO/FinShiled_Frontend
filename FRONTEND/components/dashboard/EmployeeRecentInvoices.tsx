@@ -68,7 +68,7 @@ export function EmployeeRecentInvoices({
                                             <FileText className="h-6 w-6 text-white" />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-base text-foreground">{invoice.invoiceNumber}</p>
+                                            <p className="font-bold text-base text-foreground">{!invoice.invoiceNumber || String(invoice.invoiceNumber).trim().toLowerCase() === 'n/a' || String(invoice.invoiceNumber).trim() === '—' ? 'Invalid Number' : invoice.invoiceNumber}</p>
                                             <p className="text-xs text-muted-foreground font-medium">
                                                 {formatRelativeTime(invoice.uploadedAt)}
                                             </p>

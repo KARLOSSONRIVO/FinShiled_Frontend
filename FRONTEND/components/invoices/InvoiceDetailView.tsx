@@ -314,7 +314,7 @@ export function InvoiceDetailView({ id, backUrl, backLabel = "Back to Invoices",
                         <FileText className="h-6 w-6 text-muted-foreground" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight">{data.invoiceNumber}</h2>
+                        <h2 className="text-2xl font-bold tracking-tight">{!data.invoiceNumber || String(data.invoiceNumber).trim().toLowerCase() === 'n/a' || String(data.invoiceNumber).trim() === '—' ? 'Invalid Number' : data.invoiceNumber}</h2>
                         <p className="text-muted-foreground font-medium">{data.company || "FinShield Platform"}</p>
                     </div>
                 </div>
@@ -341,7 +341,7 @@ export function InvoiceDetailView({ id, backUrl, backLabel = "Back to Invoices",
                         <div className="grid grid-cols-2 gap-y-4">
                             <div>
                                 <p className="text-xs font-bold text-foreground uppercase">Invoice Number</p>
-                                <p className="text-sm font-medium mt-1 text-muted-foreground">{data.invoiceNumber}</p>
+                                <p className="text-sm font-medium mt-1 text-muted-foreground">{!data.invoiceNumber || String(data.invoiceNumber).trim().toLowerCase() === 'n/a' || String(data.invoiceNumber).trim() === '—' ? 'Invalid Number' : data.invoiceNumber}</p>
                             </div>
                             <div>
                                 <p className="text-xs font-bold text-foreground uppercase">Invoice Date</p>

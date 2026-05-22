@@ -89,9 +89,9 @@ export function TopBar({
     const canViewPolicies = user?.role && ["AUDITOR", "COMPANY_MANAGER", "COMPANY_USER"].includes(user.role)
 
     return (
-        <header className="h-20 border-b border-border bg-background px-4 md:px-6 flex items-center justify-between">
+        <header className="h-20 border-b border-border bg-background px-4 md:px-6 flex items-center justify-between gap-4">
             {/* Left Side: Mobile Menu + Page Title */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                 {onMenuClick && (
                     <Button
                         variant="ghost"
@@ -103,15 +103,15 @@ export function TopBar({
                         <Menu className="h-5 w-5" />
                     </Button>
                 )}
-                <h1 className="text-xl font-bold text-foreground truncate">{title}</h1>
+                <h1 className="text-base sm:text-lg md:text-xl font-bold text-foreground truncate">{title}</h1>
             </div>
-
+ 
             {/* Right Side Actions */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                 {/* Notifications Popover */}
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground" suppressHydrationWarning>
+                        <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground shrink-0" suppressHydrationWarning>
                             <Bell className="h-5 w-5" />
                         </Button>
                     </PopoverTrigger>
@@ -138,30 +138,30 @@ export function TopBar({
                         </div>
                     </PopoverContent>
                 </Popover>
-
+ 
                 {/* Profile Dropdown */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="group pl-2 pr-4 py-2 h-auto flex items-center gap-3 hover:bg-muted/50 rounded-full border border-border data-[state=open]:bg-muted/50" suppressHydrationWarning>
-                            <div className="relative bg-primary/20 h-8 w-8 rounded-full flex items-center justify-center text-primary">
+                        <Button variant="ghost" className="group pl-1.5 pr-3 sm:pr-4 py-1.5 sm:py-2 h-auto flex items-center gap-1.5 sm:gap-3 hover:bg-muted/50 rounded-full border border-border data-[state=open]:bg-muted/50 shrink-0" suppressHydrationWarning>
+                            <div className="relative bg-primary/20 h-8 w-8 rounded-full flex items-center justify-center text-primary shrink-0">
                                 <User className="h-4 w-4" />
                                 {!user?.mfaEnabled && (
                                     <AlertTriangle className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 text-amber-400" strokeWidth={2.5} />
                                 )}
                             </div>
-                            <div className="flex flex-col items-start justify-center h-8 text-sm">
+                            <div className="flex flex-col items-start justify-center h-8 text-sm min-w-0 max-w-[80px] sm:max-w-[140px]">
                                 {userName || user?.username ? (
-                                    <span className="font-semibold leading-none">{displayUserName}</span>
+                                    <span className="font-semibold leading-none truncate w-full">{displayUserName}</span>
                                 ) : (
                                     <Skeleton className="h-4 w-24 mb-1.5" />
                                 )}
                                 {organizationName || user?.role ? (
-                                    <span className="text-xs text-muted-foreground leading-none mt-0.5">{displayRole}</span>
+                                    <span className="text-xs text-muted-foreground leading-none mt-0.5 truncate w-full">{displayRole}</span>
                                 ) : (
                                     <Skeleton className="h-3 w-16" />
                                 )}
                             </div>
-                            <ChevronUp className="h-3 w-3 text-muted-foreground ml-2 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                            <ChevronUp className="block h-3 w-3 text-muted-foreground ml-1 sm:ml-1.5 transition-transform duration-200 group-data-[state=open]:rotate-180 shrink-0" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 bg-sidebar text-sidebar-foreground border-sidebar-border">

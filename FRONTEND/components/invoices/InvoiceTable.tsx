@@ -120,12 +120,12 @@ export function InvoiceTable({ invoices, mode, baseUrl, pagination, onPageChange
                         </TableHead>
 
                         {showCompany(mode) && !showOrgColumn && (
-                            <TableHead className="px-4 py-4 font-bold text-base text-foreground">Company</TableHead>
+                            <TableHead className="px-4 py-4 font-bold text-base text-foreground text-center">Company</TableHead>
                         )}
 
                         {showOrgColumn && (
-                            <TableHead className="px-4 py-4">
-                                <div className="flex items-center gap-2 cursor-pointer font-bold text-base text-foreground" onClick={() => onSort?.("organizationName")}>
+                            <TableHead className="px-4 py-4 text-center">
+                                <div className="flex items-center justify-center gap-2 cursor-pointer font-bold text-base text-foreground" onClick={() => onSort?.("organizationName")}>
                                     Organization/Company
                                     {sortBy === "organizationName" ? (order === "asc" ? <ChevronUp className="h-4 w-4 text-primary" /> : <ChevronDown className="h-4 w-4 text-primary" />) : <ChevronUp className="h-4 w-4 text-muted-foreground/40" />}
                                 </div>
@@ -133,16 +133,16 @@ export function InvoiceTable({ invoices, mode, baseUrl, pagination, onPageChange
                         )}
 
                         {/* Date Column */}
-                        <TableHead className="px-4 py-4">
-                            <div className="flex items-center gap-2 cursor-pointer font-bold text-base text-foreground" onClick={() => onSort?.("invoiceDate")}>
+                        <TableHead className="px-4 py-4 text-center">
+                            <div className="flex items-center justify-center gap-2 cursor-pointer font-bold text-base text-foreground" onClick={() => onSort?.("invoiceDate")}>
                                 Invoice Date
                                 {sortBy === "invoiceDate" ? (order === "asc" ? <ChevronUp className="h-4 w-4 text-primary" /> : <ChevronDown className="h-4 w-4 text-primary" />) : <ChevronUp className="h-4 w-4 text-muted-foreground/40" />}
                             </div>
                         </TableHead>
 
                         {/* Amount Column */}
-                        <TableHead className="px-4 py-4">
-                            <div className="flex items-center gap-2 cursor-pointer font-bold text-base text-foreground" onClick={() => onSort?.("totalAmount")}>
+                        <TableHead className="px-4 py-4 text-center">
+                            <div className="flex items-center justify-center gap-2 cursor-pointer font-bold text-base text-foreground" onClick={() => onSort?.("totalAmount")}>
                                 Amount
                                 {sortBy === "totalAmount" ? (order === "asc" ? <ChevronUp className="h-4 w-4 text-primary" /> : <ChevronDown className="h-4 w-4 text-primary" />) : <ChevronUp className="h-4 w-4 text-muted-foreground/40" />}
                             </div>
@@ -154,7 +154,7 @@ export function InvoiceTable({ invoices, mode, baseUrl, pagination, onPageChange
                         )}
 
                         {/* Status Column */}
-                        <TableHead className="px-4 py-4">
+                        <TableHead className="px-4 py-4 text-center">
                             <div className="flex items-center justify-center gap-2 cursor-pointer font-bold text-base text-foreground" onClick={() => onSort?.("reviewDecision")}>
                                 Status
                                 {sortBy === "reviewDecision" ? (order === "asc" ? <ChevronUp className="h-4 w-4 text-primary" /> : <ChevronDown className="h-4 w-4 text-primary" />) : <ChevronUp className="h-4 w-4 text-muted-foreground/40" />}
@@ -193,29 +193,29 @@ export function InvoiceTable({ invoices, mode, baseUrl, pagination, onPageChange
                             return (
                                 <TableRow key={id} className="h-16 hover:bg-muted/30 transition-colors border-b border-border/50">
                                     <TableCell className="px-4 text-center font-bold text-base text-foreground">
-                                        {row.invoiceNumber || <Skeleton className="h-5 w-24 mx-auto" />}
+                                        {!row.invoiceNumber || String(row.invoiceNumber).trim().toLowerCase() === 'n/a' || String(row.invoiceNumber).trim() === '—' ? 'Invalid Number' : row.invoiceNumber}
                                     </TableCell>
 
                                     {showCompany(mode) && !showOrgColumn && (
-                                        <TableCell className="px-4 font-bold text-base text-foreground">
-                                            {listRow.companyName || <Skeleton className="h-5 w-32" />}
+                                        <TableCell className="px-4 font-bold text-base text-foreground text-center">
+                                            {listRow.companyName || <Skeleton className="h-5 w-32 mx-auto" />}
                                         </TableCell>
                                     )}
 
                                     {showOrgColumn && (
-                                        <TableCell className="px-4 font-bold text-base text-foreground">
-                                            {!getOrganizationName(row) || getOrganizationName(row) === "—" ? <Skeleton className="h-5 w-32" /> : getOrganizationName(row)}
+                                        <TableCell className="px-4 font-bold text-base text-foreground text-center">
+                                            {!getOrganizationName(row) || getOrganizationName(row) === "—" ? <Skeleton className="h-5 w-32 mx-auto" /> : getOrganizationName(row)}
                                         </TableCell>
                                     )}
 
                                     {/* Date Cell */}
-                                    <TableCell className="px-4 text-foreground">
-                                        {!date || formatDate(date) === "—" ? <Skeleton className="h-5 w-24" /> : formatDate(date)}
+                                    <TableCell className="px-4 text-foreground text-center">
+                                        {!date || formatDate(date) === "—" ? <Skeleton className="h-5 w-24 mx-auto" /> : formatDate(date)}
                                     </TableCell>
 
                                     {/* Amount Cell */}
-                                    <TableCell className="px-4 font-bold text-base text-foreground">
-                                        {amount != null ? `₱${amount.toLocaleString()}` : <Skeleton className="h-5 w-20" />}
+                                    <TableCell className="px-4 font-bold text-base text-foreground text-center">
+                                        {amount != null ? `₱${amount.toLocaleString()}` : <Skeleton className="h-5 w-20 mx-auto" />}
                                     </TableCell>
 
                                     {/* AI Verdict Cell - Only for non-employees */}

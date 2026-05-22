@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { AppSidebar, NavLink } from "@/components/layout/AppSidebar"
 import { TopBar } from "@/components/layout/TopBar"
 import { usePathname } from "next/navigation"
@@ -13,22 +13,22 @@ import {
     ScrollText,
 } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
-
+ 
 const employeeLinks: NavLink[] = [
     { href: "/company/employee", label: "Dashboard", icon: LayoutDashboard },
     { href: "/company/employee/upload", label: "Upload Invoice", icon: Upload },
     { href: "/company/employee/invoices", label: "My Invoices", icon: FileText },
     { href: "/company/employee/alerts", label: "Flagged Queue", icon: AlertTriangle },
 ]
-
+ 
 export default function EmployeeLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
     const pathname = usePathname()
-    const [collapsed, setCollapsed] = useState(false)
-
+    const [collapsed, setCollapsed] = useState(true)
+ 
     // Determine title based on path
     const getPageTitle = (path: string) => {
         if (path === "/company/employee") return "Dashboard"
@@ -37,11 +37,17 @@ export default function EmployeeLayout({
         if (path.includes("/alerts")) return "Flagged Queue"
         return "Employee Portal"
     }
-
+ 
     const { user } = useAuth()
-
+ 
+    useEffect(() => {
+        if (window.innerWidth >= 768) {
+            setCollapsed(false)
+        }
+    }, [])
+ 
     const title = getPageTitle(pathname)
-
+ 
     return (
         <div className="flex min-h-screen bg-muted/20 relative">
             {/* Sidebar with fixed positioning */}
@@ -53,7 +59,7 @@ export default function EmployeeLayout({
             // AppSidebar might not support userRole, checking next step. 
             // Omitting userRole here until verified.
             />
-
+ 
             {/* Main content wrapper */}
             <div
                 className={cn(
@@ -70,6 +76,7 @@ export default function EmployeeLayout({
                         notifications={[
                             { title: "Invoice Verified", time: "2h ago", message: "INV-2024-001 has been verified." },
                         ]}
+                        onMenuClick={() => setCollapsed(false)}
                     />
                 </div>
 

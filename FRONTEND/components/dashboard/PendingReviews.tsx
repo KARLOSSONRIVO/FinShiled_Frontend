@@ -41,7 +41,14 @@ export function PendingReviews({ invoices }: PendingReviewsProps) {
             <CardContent>
                 <div className="space-y-4">
                     {pendingInvoices.slice(0, 7).map((invoice) => {
-                        const invoiceNumber = invoice.invoiceNumber || invoice.invoiceNo || 'N/A'
+                        const getNum = (num1?: string, num2?: string) => {
+                            const n1 = String(num1 || '').trim();
+                            if (n1 && n1.toLowerCase() !== 'n/a' && n1 !== '—') return n1;
+                            const n2 = String(num2 || '').trim();
+                            if (n2 && n2.toLowerCase() !== 'n/a' && n2 !== '—') return n2;
+                            return 'Invalid Number';
+                        };
+                        const invoiceNumber = getNum(invoice.invoiceNumber, invoice.invoiceNo)
                         const companyName = invoice.companyName || 'Unknown Company'
                         const date = formatDate(invoice.date || invoice.invoiceDate)
 

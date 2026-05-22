@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { AppSidebar, NavLink } from "@/components/layout/AppSidebar"
 import { TopBar } from "@/components/layout/TopBar"
 import { usePathname } from "next/navigation"
@@ -8,33 +8,42 @@ import { cn } from "@/lib/utils"
 import {
     LayoutDashboard,
     FileText,
+    Upload,
     AlertTriangle,
     Link2,
     FileBarChart,
 } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
-
+ 
 const auditorLinks: NavLink[] = [
     { href: "/admin/auditor", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin/auditor/upload", label: "Upload Invoice", icon: Upload },
     { href: "/admin/auditor/invoices", label: "All Invoices", icon: FileText },
     { href: "/admin/auditor/flagged", label: "Flagged Queue", icon: AlertTriangle },
     { href: "/admin/auditor/pending", label: "Pending Queue", icon: AlertTriangle },
     { href: "/admin/auditor/reports", label: "Reports", icon: FileBarChart },
     { href: "/admin/auditor/blockchain", label: "Blockchain Ledger", icon: Link2 },
 ]
-
+ 
 export default function AuditorLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
     const pathname = usePathname()
-    const [collapsed, setCollapsed] = useState(false)
+    const [collapsed, setCollapsed] = useState(true)
     const { user } = useAuth()
+ 
+    useEffect(() => {
+        if (window.innerWidth >= 768) {
+            setCollapsed(false)
+        }
+    }, [])
 
     // Determine title based on path
     const getPageTitle = (path: string) => {
         if (path === "/admin/auditor") return "Auditor Dashboard"
+        if (path.includes("/upload")) return "Upload Invoice"
         if (path.includes("/invoices")) return "Invoice Auditing"
         if (path.includes("/flagged")) return "Flagged Queue"
         if (path.includes("/pending")) return "Pending Queue"

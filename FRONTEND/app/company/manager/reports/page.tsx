@@ -63,7 +63,7 @@ export default function ManagerReportsPage() {
           />
 
           {/* Filter + download row — sits below summary cards */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <ReportPeriodToggle
               value={reportPeriod}
               onChange={handlePeriodChange}
