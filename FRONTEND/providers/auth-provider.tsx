@@ -203,9 +203,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // If user must change password, stay on current page — the global dialog will appear
         if ((user as any).mustChangePassword) return
 
-        switch (user.role) {
+        switch (user.role as string) {
             case "SUPER_ADMIN":
                 router.push("/admin/superadmin")
+                break
+            case "ADMINISTRATOR":
+            case "ADMIN":
+                router.push("/admin/admin")
                 break
             case "AUDITOR":
                 router.push("/admin/external-auditor")
