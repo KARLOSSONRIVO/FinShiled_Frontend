@@ -1,10 +1,78 @@
 "use client"
 
-export default function AdminInvoices() {
-    return (
-        <div className="space-y-6">
-            <h1 className="text-3xl font-bold tracking-tight">Invoice Management</h1>
-            <p className="text-muted-foreground">Monitor and manage your company's incoming and outgoing invoices.</p>
-        </div>
-    )
+import { InvoiceTable } from "@/components/invoices/InvoiceTable"
+import { useManagerInvoices } from "@/hooks/company-manager/invoices/use-manager-invoices"
+import { DataPagination } from "@/components/common/DataPagination"
+import { InvoiceFilter } from "@/components/invoices/InvoiceFilter"
+import { InvoiceTableSkeleton } from "@/components/skeletons/invoice-table-skeleton"
+
+export default function AdminInvoicesPage() {
+  const {
+    invoices,
+    pagination,
+    isLoading,
+    search,
+    setSearch,
+    setPage,
+    sortConfig,
+    requestSort,
+    statusFilter,
+    setStatusFilter,
+    aiVerdictFilter,
+    setAiVerdictFilter,
+    dateRange,
+    setDateRange,
+    resetFilters,
+    monthFilter,
+    setMonthFilter,
+    yearFilter,
+    setYearFilter,
+    availableYears,
+  } = useManagerInvoices()
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-2xl font-normal tracking-tight">Invoice Management</h1>
+        <InvoiceFilter
+          search={search || ""}
+          onSearchChange={setSearch}
+          sortConfig={sortConfig}
+          onSortChange={requestSort}
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter as any}
+          aiVerdictFilter={aiVerdictFilter as any}
+          onAiVerdictChange={setAiVerdictFilter as any}
+          dateRange={dateRange}
+          onDateRangeChange={setDateRange}
+          onClearFilters={resetFilters}
+          monthFilter={monthFilter}
+          yearFilter={yearFilter}
+          onMonthChange={setMonthFilter}
+          onYearChange={setYearFilter}
+          availableYears={availableYears}
+        />
+      </div>
+
+      {isLoading ? (
+        <InvoiceTableSkeleton />
+      ) : (
+        <InvoiceTable
+          invoices={invoices}
+          mode="admin"
+          baseUrl="/admin/admin/invoices"
+          sortBy={sortConfig?.key}
+          order={sortConfig?.direction as "asc" | "desc" | undefined}
+          onSort={(field) => requestSort(field as any)}
+        />
+      )}
+
+      <div className="mt-4 flex justify-center">
+        <DataPagination
+          pagination={pagination}
+          onPageChange={setPage}
+        />
+      </div>
+    </div>
+  )
 }

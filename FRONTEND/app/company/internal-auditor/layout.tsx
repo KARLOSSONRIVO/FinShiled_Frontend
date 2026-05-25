@@ -8,6 +8,7 @@ import {
     LayoutDashboard,
     ScrollText,
     BarChart3,
+    Settings2,
 } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
 import { usePersistedSidebar } from "@/hooks/global/use-persisted-sidebar"
@@ -16,6 +17,7 @@ const internalAuditorLinks: NavLink[] = [
     { href: "/company/internal-auditor", label: "Verification Queue", icon: LayoutDashboard },
     { href: "/company/internal-auditor/audit-logs", label: "Audit Logs", icon: ScrollText },
     { href: "/company/internal-auditor/reports", label: "Reports", icon: BarChart3 },
+    { href: "/company/internal-auditor/settings", label: "Settings", icon: Settings2 },
 ]
 
 export default function InternalAuditorLayout({

@@ -11,7 +11,7 @@ import { ChevronUp, ChevronDown, Loader2 } from "lucide-react"
 import { DataPagination } from "../common/DataPagination"
 import { Skeleton } from "@/components/ui/skeleton"
 
-export type TableViewMode = "superadmin" | "external-auditor" | "regulator" | "manager" | "employee"
+export type TableViewMode = "superadmin" | "external-auditor" | "regulator" | "manager" | "employee" | "admin"
 
 // Extended types to include all possible fields
 interface ExtendedListInvoice extends ListInvoice {
@@ -62,7 +62,7 @@ function getVerdictColor(verdict: string) {
     }
 }
 
-const showCompany = (mode: TableViewMode) => mode !== "manager" && mode !== "employee"
+const showCompany = (mode: TableViewMode) => mode !== "manager" && mode !== "employee" && mode !== "admin"
 
 export function InvoiceTable({ invoices, mode, baseUrl, pagination, onPageChange, sortBy, order, onSort }: InvoiceTableProps) {
     const isEmployee = mode === "employee"
