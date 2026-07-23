@@ -36,6 +36,7 @@ export default function PlatformUsersPage() {
     handleUpdateStatus,
     handleRegenerateTemporaryPassword,
     isRegeneratingTemporaryPassword,
+    isCreating,
     userTypeFilter,
     setUserTypeFilter,
     isLoading
@@ -46,7 +47,8 @@ export default function PlatformUsersPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-normal tracking-tight">User Management</h2>
         <Button
-          className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-medium"
+          disabled={isCreating}
+          className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-medium disabled:opacity-60 disabled:cursor-not-allowed"
           onClick={() => setIsCreateOpen(true)}
         >
           <Plus className="h-4 w-4" />
@@ -61,6 +63,7 @@ export default function PlatformUsersPage() {
         setNewUser={setNewUser}
         organizations={organizations}
         onCreateUser={handleCreateUser}
+        isLoading={isCreating}
       />
 
       <div className="flex flex-col gap-4">

@@ -99,7 +99,7 @@ export function AppSidebar({ links, collapsed, setCollapsed, title = "FinShield"
                 </div>
 
                 {/* Navigation Links */}
-                <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {links.map((link) => {
                         const isActive = pathname === link.href
 
@@ -191,7 +191,7 @@ export function AppSidebar({ links, collapsed, setCollapsed, title = "FinShield"
                             </div>
 
                             {/* Navigation Links */}
-                            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                                 {links.map((link) => {
                                     const isActive = pathname === link.href
 

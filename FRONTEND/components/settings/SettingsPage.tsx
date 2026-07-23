@@ -3,7 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MFASettings } from "./MFASettings"
 import { AppearanceSettings } from "./AppearanceSettings"
-import { User, Shield, Lock, KeyRound } from "lucide-react"
+import { User, Shield, Lock, KeyRound, MailCheck, MailX } from "lucide-react"
 import { useAuth } from "@/hooks/global/use-auth"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -111,6 +111,37 @@ export function SettingsPage() {
                                     ) : (
                                         <Skeleton className="h-10 w-full" />
                                     )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Email Verification Card — temporary UI, wire to API when emailVerified field is available */}
+                        <div className="p-4 sm:p-6 border rounded-xl bg-card text-card-foreground shadow-sm space-y-6 w-full overflow-hidden">
+                            <div>
+                                <h4 className="font-semibold text-lg flex items-center gap-2">
+                                    <MailCheck className="h-5 w-5 text-emerald-500" />
+                                    Email Verification
+                                </h4>
+                                <p className="text-sm text-muted-foreground">
+                                    Status of your registered email address.
+                                </p>
+                            </div>
+
+                            <div className="flex items-center justify-between bg-muted/50 p-4 rounded-lg">
+                                <div className="min-w-0 flex-1 pr-3">
+                                    <p className="font-medium text-sm truncate">{user?.email ?? "—"}</p>
+                                    <p className="text-xs text-muted-foreground mt-0.5">Registered email address</p>
+                                </div>
+                                {/* Badge — swap condition to user?.emailVerified when API supports it */}
+                                <div className={`flex items-center gap-1.5 shrink-0 px-3 py-1 rounded-full text-xs font-semibold ${
+                                    true // TODO: replace with user?.emailVerified
+                                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400"
+                                        : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
+                                }`}>
+                                    {true // TODO: replace with user?.emailVerified
+                                        ? <><MailCheck className="h-3.5 w-3.5" /> Verified</>
+                                        : <><MailX className="h-3.5 w-3.5" /> Not Verified</>
+                                    }
                                 </div>
                             </div>
                         </div>

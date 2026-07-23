@@ -25,7 +25,7 @@ const superAdminLinks: NavLink[] = [
     { href: "/admin/superadmin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/superadmin/organizations", label: "Organizations", icon: Building2 },
     { href: "/admin/superadmin/users", label: "Platform Users", icon: Users },
-    { href: "/admin/superadmin/assignments", label: "External Auditor Assignments", icon: UserPlus },
+    { href: "/admin/superadmin/assignments", label: "Ext. Auditor Assignments", icon: UserPlus },
     { href: "/admin/superadmin/invoices", label: "All Invoices", icon: FileText },
     { href: "/admin/superadmin/flagged", label: "Flagged Queue", icon: AlertTriangle },
     { href: "/admin/superadmin/reports", label: "Reports", icon: FileBarChart },
@@ -49,7 +49,7 @@ export default function SuperAdminLayout({
         if (path === "/admin/superadmin") return "Dashboard"
         if (path.includes("/organizations")) return "Organization Management"
         if (path.includes("/users")) return "Platform Users"
-        if (path.includes("/assignments")) return "External Auditor Assignments"
+        if (path.includes("/assignments")) return "Ext. Auditor Assignments"
         if (path.includes("/invoices")) return "All Invoices"
         if (path.includes("/flagged")) return "Flagged Queue"
         if (path.includes("/reports")) return "Platform Reports"

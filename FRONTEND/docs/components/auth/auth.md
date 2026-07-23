@@ -39,11 +39,41 @@ Located at `/forgot-password`. Multi-step form:
 
 ---
 
-## Change Password Dialog — `components/auth/` or `components/global/`
-Appears in two contexts:
+## Change Temporary Password Page — `app/change-temporary-password/page.tsx`
 
-1. **Forced change** — when `user.mustChangePassword === true`, the user is redirected to `/change-temporary-password` (a dedicated page). They cannot access any other part of the app until the password is changed. Calls `AuthService.changePassword()`.
-2. **Voluntary change** — accessible from Settings → Security. Same form, same service call.
+The dedicated full-page screen rendered when `user.mustChangePassword === true`. Users cannot access any other part of the app until this step is complete (enforced by `PasswordChangeGate`).
+
+**Fields:** Current temporary password · New password · Confirm new password
+
+**Validation (client-side, real-time):**
+- At least 12 characters
+- One uppercase letter
+- One lowercase letter
+- One number
+- One special character
+- New password ≠ current temporary password
+- New password matches confirmation
+
+**Submission:** calls `AuthService.changePassword({ currentPassword, newPassword, confirmPassword })` → on success, calls `clearSession()` and redirects to `/login`.
+
+### Responsive Layout
+
+The page uses **two separate layouts** via Tailwind breakpoints — same state and logic, different visual presentation:
+
+| | Mobile (`< lg`) | Desktop (`lg+`) |
+|---|---|---|
+| **Logo** | Large centered logo (`h-28`), matches login page | Inside dark left panel |
+| **Heading** | `"Change your password"` bold `text-3xl` + subtitle | `"Change temporary password"` inside white card |
+| **Form wrapper** | No card — bare form on `bg-[#f5f5f0]` background | White `rounded-[28px]` card with shadow |
+| **Input height** | `h-14` rounded-xl white inputs (matches login) | `h-12` inputs |
+| **Submit button** | `h-14 bg-emerald-500 rounded-xl shadow-lg` (matches login) | `h-12 bg-emerald-600` |
+| **Requirements box** | White card with border | Green-tinted `bg-[#f3f7f5]` card |
+| **Left panel** | Hidden | Dark `bg-[#101714]` panel with steps timeline |
+
+The mobile layout intentionally mirrors the `/login` page to provide a consistent auth experience on small screens. The desktop layout keeps the original two-column design with the dark informational panel on the left.
+
+> [!NOTE]
+> Both the desktop form and the mobile form share the same React state (`showCurrent`, `showNew`, `showConfirm`, `currentPassword`, etc.). They use distinct `id` attributes (e.g. `current-password` vs `current-password-m`) to avoid duplicate-id issues in the DOM.
 
 ---
 

@@ -14,7 +14,7 @@ import {
     DialogTrigger,
     DialogClose,
 } from "@/components/ui/dialog"
-import { Plus, X } from "lucide-react"
+import { Plus, X, Loader2 } from "lucide-react"
 import type { Organization } from "@/lib/types"
 
 interface CreateUserDialogProps {
@@ -24,6 +24,7 @@ interface CreateUserDialogProps {
     setNewUser: (user: any) => void
     organizations: Organization[]
     onCreateUser: () => void
+    isLoading?: boolean
 }
 
 export function CreateUserDialog({
@@ -33,6 +34,7 @@ export function CreateUserDialog({
     setNewUser,
     organizations,
     onCreateUser,
+    isLoading = false,
 }: CreateUserDialogProps) {
     const itemsDisabled = newUser.role === "AUDITOR" || newUser.role === "REGULATOR"
 
@@ -41,7 +43,10 @@ export function CreateUserDialog({
             <DialogContent className="sm:max-w-[400px] border border-black shadow-none rounded-xl flex flex-col" showCloseButton={false}>
                 <DialogHeader className="flex flex-row items-center justify-between border-b pb-4">
                     <DialogTitle className="text-xl font-normal">Add New User</DialogTitle>
-                    <DialogClose className="opacity-70 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                    <DialogClose
+                        disabled={isLoading}
+                        className="opacity-70 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+                    >
                         <X className="h-6 w-6" /> {/* Bigger close icon */}
                         <span className="sr-only">Close</span>
                     </DialogClose>
@@ -141,8 +146,19 @@ export function CreateUserDialog({
 
 
                     <DialogFooter>
-                        <Button type="submit" className="w-full bg-[#00C28C] hover:bg-[#00C28C]/90 text-white font-bold h-11 rounded-lg text-base">
-                            Create User
+                        <Button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full bg-[#00C28C] hover:bg-[#00C28C]/90 text-white font-bold h-11 rounded-lg text-base disabled:opacity-80"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Creating...
+                                </>
+                            ) : (
+                                "Create User"
+                            )}
                         </Button>
                     </DialogFooter>
                 </form>
