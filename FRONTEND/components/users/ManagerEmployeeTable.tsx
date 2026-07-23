@@ -8,11 +8,9 @@ interface ManagerEmployeeTableProps {
     sortConfig: any
     onSort: (key: any) => void
     onUpdateStatus: (userId: string, status: "ACTIVE" | "INACTIVE", reason?: string) => void
-    onRegenerateTemporaryPassword: (userId: string) => void
-    isRegeneratingTemporaryPassword?: boolean
 }
 
-export function ManagerEmployeeTable({ users, sortConfig, onSort, onUpdateStatus, onRegenerateTemporaryPassword, isRegeneratingTemporaryPassword }: ManagerEmployeeTableProps) {
+export function ManagerEmployeeTable({ users, sortConfig, onSort, onUpdateStatus }: ManagerEmployeeTableProps) {
     return (
         <UserTable
             users={users}
@@ -21,8 +19,6 @@ export function ManagerEmployeeTable({ users, sortConfig, onSort, onUpdateStatus
             onSort={onSort}
             hideRoleAndOrg={true}
             onUpdateStatus={onUpdateStatus}
-            onRegenerateTemporaryPassword={onRegenerateTemporaryPassword}
-            isRegeneratingTemporaryPassword={isRegeneratingTemporaryPassword}
         />
     )
 }

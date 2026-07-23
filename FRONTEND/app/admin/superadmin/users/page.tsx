@@ -101,8 +101,6 @@ export default function PlatformUsersPage() {
         <UserTable
           users={users.filter(u => u.role !== 'COMPANY_USER')}
           onUpdateStatus={handleUpdateStatus}
-          onRegenerateTemporaryPassword={handleRegenerateTemporaryPassword}
-          isRegeneratingTemporaryPassword={isRegeneratingTemporaryPassword}
           pagination={pagination}
           onPageChange={setPage}
           sortBy={sortConfig?.key}
@@ -114,7 +112,6 @@ export default function PlatformUsersPage() {
             }
             return null
           }}
-
         />
       )}
     </div>

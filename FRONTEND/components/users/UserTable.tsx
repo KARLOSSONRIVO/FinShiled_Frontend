@@ -21,8 +21,6 @@ import { DisableUserDialog } from "./DisableUserDialog"
 interface UserTableProps {
     users: User[]
     onUpdateStatus: (userId: string, status: "ACTIVE" | "INACTIVE", reason?: string) => void
-    onRegenerateTemporaryPassword?: (userId: string) => void
-    isRegeneratingTemporaryPassword?: boolean
     renderSubComponent?: (user: User) => React.ReactNode
     pagination?: PaginationDetails
     onPageChange?: (page: number) => void
@@ -32,7 +30,7 @@ interface UserTableProps {
     hideRoleAndOrg?: boolean
 }
 
-export function UserTable({ users, onUpdateStatus, onRegenerateTemporaryPassword, isRegeneratingTemporaryPassword = false, renderSubComponent, pagination, onPageChange, sortBy, order, onSort, hideRoleAndOrg = false }: UserTableProps) {
+export function UserTable({ users, onUpdateStatus, renderSubComponent, pagination, onPageChange, sortBy, order, onSort, hideRoleAndOrg = false }: UserTableProps) {
     const [statusUpdate, setStatusUpdate] = useState<{ id: string, status: "ACTIVE" | "INACTIVE" } | null>(null)
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
 
@@ -138,17 +136,7 @@ export function UserTable({ users, onUpdateStatus, onRegenerateTemporaryPassword
                                                         Enable
                                                     </Button>
                                                 )}
-                                                {user.mustChangePassword && onRegenerateTemporaryPassword && (
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        disabled={isRegeneratingTemporaryPassword}
-                                                        className="h-8 border-emerald-600 px-3 text-xs font-bold text-emerald-700 hover:bg-emerald-50"
-                                                        onClick={() => onRegenerateTemporaryPassword(user.id || user._id)}
-                                                    >
-                                                        Generate new temporary password
-                                                    </Button>
-                                                )}
+
                                                 </div>
                                             </TableCell>
                                             {renderSubComponent && (
