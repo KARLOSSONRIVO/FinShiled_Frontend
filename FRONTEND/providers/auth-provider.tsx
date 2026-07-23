@@ -5,7 +5,6 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { AuthService } from "@/services/auth.service"
 import type { components } from "@/lib/api-types"
-import { toast } from "sonner"
 
 type User = components["schemas"]["User"]
 type LoginRequest = Parameters<typeof AuthService.login>[0]
@@ -16,6 +15,7 @@ interface AuthContextType {
     isLoading: boolean
     login: (credentials: LoginRequest) => Promise<any>
     logout: () => Promise<void>
+    clearSession: () => void
     refreshUser: () => Promise<void>
     verifyMfaLogin: (tempToken: string, token: string) => Promise<void>
     enableMfa: (token: string) => Promise<void>
@@ -108,10 +108,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } else {
                 throw new Error("Login failed")
             }
-        } catch (error: any) {
-            const msg = error.response?.data?.message || "Login failed"
-            toast.error(msg)
-            throw error
         } finally {
             setIsLoading(false)
         }
@@ -122,10 +118,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             const response = await AuthService.verifyMfa({ tempToken, token })
             handleAuthSuccess(response)
-        } catch (error: any) {
-            const msg = error.response?.data?.message || "MFA verification failed"
-            toast.error(msg)
-            throw error
         } finally {
             setIsLoading(false)
         }
@@ -157,32 +149,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
+    const clearSession = () => {
+        localStorage.removeItem('token')
+        localStorage.removeItem('refreshToken')
+        localStorage.removeItem('user')
+
+        if (typeof window !== 'undefined') {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i)
+                if (key && (key.startsWith('finshield_') || key.startsWith('FINSHIELD_'))) {
+                    localStorage.removeItem(key)
+                }
+            }
+        }
+
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+        setUser(null)
+    }
+
     const logout = async () => {
         try {
             await AuthService.logout()
         } catch (error: any) {
             // Silently fail logout if token is already bad, user is being redirected anyway
         } finally {
-            // Clear all sensitive user session items
-            localStorage.removeItem("token")
-            localStorage.removeItem("refreshToken")
-            localStorage.removeItem("user")
-
-            // Clear all FinShield cached layouts, filter inputs, and query caches
-            if (typeof window !== "undefined") {
-                for (let i = localStorage.length - 1; i >= 0; i--) {
-                    const key = localStorage.key(i)
-                    if (key && (key.startsWith("finshield_") || key.startsWith("FINSHIELD_"))) {
-                        localStorage.removeItem(key)
-                    }
-                }
-            }
-
-            // Remove cookie
-            document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
-
-            setUser(null)
-            router.push("/login")
+            clearSession()
+            router.push('/login')
         }
     }
 
@@ -200,8 +192,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const navigateBasedOnRole = (user: User) => {
-        // If user must change password, stay on current page — the global dialog will appear
-        if ((user as any).mustChangePassword) return
+        if ((user as any).mustChangePassword) {
+            router.replace('/change-temporary-password')
+            return
+        }
 
         switch (user.role as string) {
             case "SUPER_ADMIN":
@@ -235,6 +229,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             isLoading,
             login,
             logout,
+            clearSession,
             refreshUser,
             verifyMfaLogin,
             enableMfa,

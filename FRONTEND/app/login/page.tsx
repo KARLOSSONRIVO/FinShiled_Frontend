@@ -14,9 +14,7 @@ import { useAuth } from "@/hooks/global/use-auth"
 import { toast } from "sonner"
 import { sanitizeInput } from "@/lib/utils"
 import { useTheme } from "next-themes"
-import { TermsAcceptDialog } from "@/components/terms/TermsAcceptDialog"
-
-type LoginStep = 'login' | 'mfa' | 'terms'
+type LoginStep = 'login' | 'mfa'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -26,7 +24,7 @@ export default function LoginPage() {
   const { showPassword, toggle, inputType } = usePasswordVisibility()
   const [tempToken, setTempToken] = useState("")
   const [otp, setOtp] = useState("")
-  const { login, verifyMfaLogin, isLoading, user, logout } = useAuth()
+  const { login, verifyMfaLogin, isLoading, user } = useAuth()
   const { setTheme } = useTheme()
 
   const [isPending, setIsPending] = useState(false)
@@ -37,18 +35,12 @@ export default function LoginPage() {
     setTheme('light')
   }, [setTheme])
 
-  // When user is loaded, check if terms need to be shown
+  // Route forced-password users only to the dedicated credential handoff page.
   useEffect(() => {
     if (!isLoading && user) {
-      // Check if user needs to accept terms (based on mustChangePassword flag for certain roles)
-      const needsTerms = user.mustChangePassword &&
-        user.role &&
-        ['AUDITOR', 'COMPANY_MANAGER', 'COMPANY_USER'].includes(user.role)
-
-      if (needsTerms) {
-        setStep('terms')
+      if (user.mustChangePassword) {
+        router.replace('/change-temporary-password')
       } else {
-        // No terms needed, redirect to dashboard
         redirectToDashboard()
       }
     }
@@ -81,7 +73,7 @@ export default function LoginPage() {
         setStep('mfa')
         toast.info("Please enter the code from your authenticator app")
       }
-      // If login successful and no MFA, the effect above will handle terms/redirect
+      // If login succeeds without MFA, the effect above handles forced change/redirect.
     } catch (error: any) {
       let message = error.response?.data?.message || error.message || "Invalid credentials"
       if (message === "User is not active") {
@@ -100,27 +92,13 @@ export default function LoginPage() {
     try {
       await verifyMfaLogin(tempToken, otp)
       toast.success("Login successful")
-      // The effect above will handle terms/redirect
+      // The effect above handles forced change/redirect.
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || "Invalid code"
       toast.error(`Verification failed: ${message}`)
     } finally {
       setIsPending(false)
     }
-  }
-
-  const handleTermsAccept = () => {
-    // Terms accepted – redirect to dashboard (global password change will appear there)
-    redirectToDashboard()
-  }
-
-  const handleTermsCancel = async () => {
-    await logout()
-    setStep('login')
-    setOtp("")
-    setTempToken("")
-    setEmail("")
-    setPassword("")
   }
 
   const handleBackToLogin = () => {
@@ -215,7 +193,6 @@ export default function LoginPage() {
 
   // Default login form
   return (
-    <>
       <div className="h-screen w-full flex overflow-hidden">
         {/* Left Side - Login Form */}
         <div className="w-full lg:w-1/2 h-full flex flex-col justify-center items-center px-8 md:px-16 lg:px-24 xl:px-32 py-8 bg-[#f5f5f0]">
@@ -377,15 +354,5 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Terms Acceptance Dialog */}
-      <TermsAcceptDialog
-        open={step === 'terms'}
-        onOpenChange={(open) => {
-          if (!open) handleTermsCancel()
-        }}
-        onAccept={handleTermsAccept}
-        onCancel={handleTermsCancel}
-      />
-    </>
   )
 }

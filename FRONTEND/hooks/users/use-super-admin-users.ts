@@ -105,16 +105,19 @@ export function useUsers({ isEmployeesOnly = false, initialLimit = 5 } = {}) {
 
             const payload = {
                 email: newUser.email,
-                password: "Password123!",
                 username: newUser.username,
                 role: newUser.role as any,
                 orgId: (newUser.orgId || "").trim() || undefined
             }
             return await UserService.createUser(payload)
         },
-        onSuccess: () => {
+        onSuccess: (response) => {
             queryClient.invalidateQueries({ queryKey: ["users"] })
-            toast.success("User created successfully!")
+            if (response.data.welcomeEmail.status === 'sent') {
+                toast.success('User created and welcome email sent')
+            } else {
+                toast.warning('User created, but email delivery failed. Use Generate new temporary password to retry.')
+            }
             setIsCreateOpen(false)
             setNewUser({ email: "", username: "", role: "", orgId: "" })
             setCreateError(null)
@@ -124,6 +127,21 @@ export function useUsers({ isEmployeesOnly = false, initialLimit = 5 } = {}) {
             setCreateError(msg)
             toast.error(msg)
         }
+    })
+
+    const regenerateMutation = useMutation({
+        mutationFn: (userId: string) => UserService.regenerateTemporaryPassword(userId),
+        onSuccess: (response) => {
+            queryClient.invalidateQueries({ queryKey: ['users'] })
+            if (response.data.welcomeEmail.status === 'sent') {
+                toast.success('New temporary password generated and welcome email sent')
+            } else {
+                toast.warning('Temporary password changed, but email delivery failed. Wait before retrying.')
+            }
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || error.message || 'Could not regenerate the temporary password')
+        },
     })
 
     // Update User Status Mutation
@@ -167,6 +185,8 @@ export function useUsers({ isEmployeesOnly = false, initialLimit = 5 } = {}) {
         setNewUser,
         handleCreateUser: () => createUserMutation.mutate(),
         isCreating: createUserMutation.isPending,
+        handleRegenerateTemporaryPassword: (userId: string) => regenerateMutation.mutate(userId),
+        isRegeneratingTemporaryPassword: regenerateMutation.isPending,
         createError,
         setCreateError,
 

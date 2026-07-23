@@ -71,17 +71,8 @@ export function AddEmployeeDialog({ isOpen, onOpenChange, onSubmit, newUser, set
                         />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label className="font-bold text-base">Temporary Password</Label>
-                        <Input
-                            type="text"
-                            disabled
-                            value="Password123!"
-                            className="border border-black rounded-lg h-11 bg-muted"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Employee will be required to change password on first login
-                        </p>
+                    <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+                        FinShield will securely generate a temporary password and email it to the employee. They must replace it on first login.
                     </div>
 
                     <DialogFooter>

@@ -17,6 +17,7 @@ interface LoginResponse {
             username: string
             status: string
             mfaEnabled: boolean
+            mustChangePassword: boolean
         }
     }
 }
@@ -52,7 +53,7 @@ export const AuthService = {
         return data
     },
 
-    changePassword: async (payload: { currentPassword: string; newPassword: string }) => {
+    changePassword: async (payload: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
         const { data } = await apiClient.post("/auth/change-password", payload)
         return data
     },

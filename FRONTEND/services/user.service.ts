@@ -3,7 +3,6 @@ import { PaginatedResponse, PaginationQuery, User } from "@/lib/types"
 
 interface CreateUserRequest {
     email: string;
-    password: string;
     username: string;
     role: "SUPER_ADMIN" | "AUDITOR" | "REGULATOR" | "COMPANY_MANAGER" | "COMPANY_USER";
     orgId?: string;
@@ -25,8 +24,13 @@ export const UserService = {
         return data
     },
 
-    createUser: async (user: CreateUserRequest): Promise<{ success: boolean; data: User }> => {
-        const { data } = await apiClient.post<{ success: boolean; data: User }>("/user/createUser", user)
+    createUser: async (user: CreateUserRequest): Promise<{ ok: boolean; message: string; data: { user: User; welcomeEmail: { status: 'sent' | 'failed' } } }> => {
+        const { data } = await apiClient.post<{ ok: boolean; message: string; data: { user: User; welcomeEmail: { status: 'sent' | 'failed' } } }>("/user/createUser", user)
+        return data
+    },
+
+    regenerateTemporaryPassword: async (id: string): Promise<{ ok: boolean; message: string; data: { user: User; welcomeEmail: { status: 'sent' | 'failed' } } }> => {
+        const { data } = await apiClient.post<{ ok: boolean; message: string; data: { user: User; welcomeEmail: { status: 'sent' | 'failed' } } }>(`/user/${id}/regenerate-temporary-password`)
         return data
     },
 

@@ -19,6 +19,10 @@ export interface User extends SchemaUser {
     organizationName?: string;
     /** Last login timestamp */
     lastLoginAt?: string;
+    /** Whether access is limited to completing the temporary-password handoff. */
+    mustChangePassword?: boolean;
+    /** Latest welcome-email delivery state. */
+    welcomeEmailStatus?: "pending" | "sent" | "failed";
     /** Child users managed by this user (e.g. employees of a manager) */
     employees?: User[];
     /** User who disabled this account */

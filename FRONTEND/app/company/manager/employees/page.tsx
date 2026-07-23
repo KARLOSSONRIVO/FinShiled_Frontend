@@ -34,6 +34,8 @@ export default function ManagerEmployeesPage() {
     setNewUser,
     handleCreateUser,
     handleUpdateStatus,
+    handleRegenerateTemporaryPassword,
+    isRegeneratingTemporaryPassword,
     localStatusSort,
     setLocalStatusSort,
     isLoading // Destructure isLoading
@@ -101,6 +103,8 @@ export default function ManagerEmployeesPage() {
           sortConfig={sortConfig}
           onSort={requestSort}
           onUpdateStatus={handleUpdateStatus}
+          onRegenerateTemporaryPassword={handleRegenerateTemporaryPassword}
+          isRegeneratingTemporaryPassword={isRegeneratingTemporaryPassword}
         />
       )}
 

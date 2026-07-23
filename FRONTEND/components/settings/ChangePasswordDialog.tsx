@@ -90,7 +90,7 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
             return
         }
 
-        changePassword({ currentPassword, newPassword })
+        changePassword({ currentPassword, newPassword, confirmPassword })
     }
 
     return (

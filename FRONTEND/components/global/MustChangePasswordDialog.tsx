@@ -56,7 +56,7 @@ export function MustChangePasswordDialog({
         : !!(user as any)?.mustChangePassword && !hasChanged && !shouldBlock
 
     const { mutate: changePassword, isPending } = useMutation({
-        mutationFn: (data: { currentPassword: string; newPassword: string }) =>
+        mutationFn: (data: { currentPassword: string; newPassword: string; confirmPassword: string }) =>
             AuthService.changePassword(data),
         onSuccess: async () => {
             toast.success("Password updated successfully! Logging you back in...")
@@ -160,7 +160,7 @@ export function MustChangePasswordDialog({
             return
         }
 
-        changePassword({ currentPassword, newPassword })
+        changePassword({ currentPassword, newPassword, confirmPassword })
     }
 
     const handleCancel = () => {

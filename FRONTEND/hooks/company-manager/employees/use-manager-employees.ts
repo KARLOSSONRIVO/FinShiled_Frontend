@@ -68,11 +68,14 @@ export function useManagerEmployees() {
         mutationFn: () => UserService.createUser({
             email: newUser.email,
             username: newUser.username,
-            role: "COMPANY_USER",
-            password: "Password123!" // Default password
+            role: "COMPANY_USER"
         }),
-        onSuccess: () => {
-            toast.success(`Created employee: ${newUser.email}`)
+        onSuccess: (response) => {
+            if (response.data.welcomeEmail.status === 'sent') {
+                toast.success(`Created employee and emailed ${newUser.email}`)
+            } else {
+                toast.warning('Employee created, but email delivery failed. Generate a new temporary password to retry.')
+            }
             setIsCreateOpen(false)
             setNewUser({ email: "", username: "", role: "COMPANY_USER", orgId: "" })
             queryClient.invalidateQueries({ queryKey: ["manager-employees"] })
@@ -82,6 +85,21 @@ export function useManagerEmployees() {
             setCreateError(msg)
             toast.error(msg)
         }
+    })
+
+    const regenerateMutation = useMutation({
+        mutationFn: (userId: string) => UserService.regenerateTemporaryPassword(userId),
+        onSuccess: (response) => {
+            queryClient.invalidateQueries({ queryKey: ['manager-employees'] })
+            if (response.data.welcomeEmail.status === 'sent') {
+                toast.success('New temporary password generated and welcome email sent')
+            } else {
+                toast.warning('Temporary password changed, but email delivery failed. Wait before retrying.')
+            }
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || error.message || 'Could not regenerate the temporary password')
+        },
     })
 
     const handleCreateUser = () => {
@@ -115,6 +133,8 @@ export function useManagerEmployees() {
         users,
         handleCreateUser,
         handleUpdateStatus,
+        handleRegenerateTemporaryPassword: (userId: string) => regenerateMutation.mutate(userId),
+        isRegeneratingTemporaryPassword: regenerateMutation.isPending,
 
         currentPage,
         totalPages,

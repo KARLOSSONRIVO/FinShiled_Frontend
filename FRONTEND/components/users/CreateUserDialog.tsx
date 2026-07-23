@@ -135,15 +135,8 @@ export function CreateUserDialog({
                         </Select>
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label className="font-bold text-base">Password</Label>
-                        <Input
-                            type="password"
-                            disabled
-                            placeholder="Default: Password123!"
-                            className="border border-black rounded-lg h-11 bg-muted"
-                        />
-                        <p className="text-xs text-muted-foreground">Default password will be set automatically.</p>
+                    <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+                        FinShield will securely generate a temporary password and email it to the user. They must replace it on first login.
                     </div>
 
 

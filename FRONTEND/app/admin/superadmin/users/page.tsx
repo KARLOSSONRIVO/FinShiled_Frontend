@@ -34,6 +34,8 @@ export default function PlatformUsersPage() {
     organizations,
     handleCreateUser,
     handleUpdateStatus,
+    handleRegenerateTemporaryPassword,
+    isRegeneratingTemporaryPassword,
     userTypeFilter,
     setUserTypeFilter,
     isLoading
@@ -99,6 +101,8 @@ export default function PlatformUsersPage() {
         <UserTable
           users={users.filter(u => u.role !== 'COMPANY_USER')}
           onUpdateStatus={handleUpdateStatus}
+          onRegenerateTemporaryPassword={handleRegenerateTemporaryPassword}
+          isRegeneratingTemporaryPassword={isRegeneratingTemporaryPassword}
           pagination={pagination}
           onPageChange={setPage}
           sortBy={sortConfig?.key}
