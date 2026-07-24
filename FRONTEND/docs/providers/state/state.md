@@ -18,9 +18,8 @@ interface AuthContextType {
   login(credentials): Promise<any>
   logout(): Promise<void>
   refreshUser(): Promise<void>
-  verifyMfaLogin(tempToken, token): Promise<void>
-  enableMfa(token): Promise<void>
-  disableMfa(password): Promise<void>
+  clearSession(): void
+  completeMfaAuthentication(response): void
 }
 ```
 
@@ -53,8 +52,8 @@ The 5s timeout prevents `isLoading` from hanging indefinitely when the backend i
 ### `login(credentials)`
 
 1. Calls `AuthService.login()`
-2. If `mfaRequired: true` → returns `{ mfaRequired: true, tempToken }` — UI shows MFA input
-3. If success → calls `handleAuthSuccess()` which:
+2. Stores the restricted response in session storage and routes to password change or `/mfa`
+3. Only `completeMfaAuthentication()` calls `handleAuthSuccess()`, after successful MFA, which:
    - Stores `accessToken`, `refreshToken`, `user` in `localStorage`
    - Sets `token` cookie for the Next.js middleware (1 day, SameSite=Strict)
    - Calls `navigateBasedOnRole(user)` to redirect

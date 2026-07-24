@@ -18,9 +18,8 @@ const {
   login,
   logout,
   refreshUser,
-  verifyMfaLogin,
-  enableMfa,
-  disableMfa,
+  clearSession,
+  completeMfaAuthentication,
 } = useAuthContext()
 ```
 

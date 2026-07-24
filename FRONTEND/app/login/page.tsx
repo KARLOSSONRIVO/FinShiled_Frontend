@@ -14,17 +14,13 @@ import { useAuth } from "@/hooks/global/use-auth"
 import { toast } from "sonner"
 import { sanitizeInput } from "@/lib/utils"
 import { useTheme } from "next-themes"
-type LoginStep = 'login' | 'mfa'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [step, setStep] = useState<LoginStep>('login')
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const { showPassword, toggle, inputType } = usePasswordVisibility()
-  const [tempToken, setTempToken] = useState("")
-  const [otp, setOtp] = useState("")
-  const { login, verifyMfaLogin, isLoading, user } = useAuth()
+  const { login, isLoading, user } = useAuth()
   const { setTheme } = useTheme()
 
   const [isPending, setIsPending] = useState(false)
@@ -67,13 +63,8 @@ export default function LoginPage() {
     setIsPending(true)
     setLoginError(false)
     try {
-      const response = await login({ email: sanitizeInput(email), password })
-      if (response?.mfaRequired) {
-        setTempToken(response.tempToken)
-        setStep('mfa')
-        toast.info("Please enter the code from your authenticator app")
-      }
-      // If login succeeds without MFA, the effect above handles forced change/redirect.
+      await login({ email: sanitizeInput(email), password })
+      // AuthProvider routes the restricted response to password change or MFA.
     } catch (error: any) {
       let message = error.response?.data?.message || error.message || "Invalid credentials"
       if (message === "User is not active") {
@@ -86,112 +77,6 @@ export default function LoginPage() {
     }
   }
 
-  const handleVerifyMfa = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsPending(true)
-    try {
-      await verifyMfaLogin(tempToken, otp)
-      toast.success("Login successful")
-      // The effect above handles forced change/redirect.
-    } catch (error: any) {
-      const message = error.response?.data?.message || error.message || "Invalid code"
-      toast.error(`Verification failed: ${message}`)
-    } finally {
-      setIsPending(false)
-    }
-  }
-
-  const handleBackToLogin = () => {
-    setStep('login')
-    setOtp("")
-    setTempToken("")
-    setEmail("")
-    setPassword("")
-  }
-
-  // MFA form
-  if (step === 'mfa') {
-    return (
-      <div className="h-screen w-full flex overflow-hidden">
-        <div className="w-full lg:w-1/2 h-full flex flex-col justify-center items-center px-8 md:px-16 lg:px-24 xl:px-32 py-8 bg-[#f5f5f0]">
-          <div className="w-full max-w-md my-auto">
-            <div className="mb-8 flex justify-center">
-              <Link href="/">
-                <Image
-                  src="/assets/image/FinShield.svg"
-                  alt="FinShield Logo"
-                  width={160}
-                  height={160}
-                  className="h-28 w-auto md:h-32"
-                />
-              </Link>
-            </div>
-
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl md:text-4xl text-gray-800 mb-3">
-                Two-Factor <span className="font-bold">Authentication</span>
-              </h1>
-              <p className="text-gray-500 text-base">
-                Please enter the 6-digit code from your authenticator app.
-              </p>
-            </div>
-
-            <form onSubmit={handleVerifyMfa} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="otp" className="text-gray-700 text-sm font-medium">
-                  Authentication Code
-                </Label>
-                <Input
-                  id="otp"
-                  type="text"
-                  placeholder="000000"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  required
-                  maxLength={6}
-                  className="!bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 h-14 rounded-xl focus:border-emerald-500 focus:ring-emerald-500 shadow-sm text-center text-2xl tracking-widest"
-                  autoFocus
-                />
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isPending || isLoading || otp.length !== 6}
-                isLoading={isPending || isLoading}
-                loadingText="Verifying..."
-                className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all duration-200 text-base tracking-wide shadow-lg shadow-emerald-500/25 disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                Verify
-              </Button>
-
-              <div className="text-center mt-4">
-                <button
-                  type="button"
-                  onClick={handleBackToLogin}
-                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                >
-                  Back to Login
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-        <div className="hidden lg:flex lg:w-1/2 relative bg-[#0a0a0a] flex-col justify-center p-10 xl:p-16 h-full overflow-hidden">
-          <div className="flex-1 flex flex-col justify-center items-center text-center">
-            <div className="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center mb-6 shrink-0">
-              <svg className="w-12 h-12 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h2 className="text-3xl font-bold text-white mb-4">Secure Access</h2>
-            <p className="text-gray-400 max-w-md">Your account is protected with two-factor authentication. This extra layer of security ensures only you can access your data.</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Default login form
   return (
       <div className="h-screen w-full flex overflow-hidden">
         {/* Left Side - Login Form */}

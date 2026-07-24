@@ -34,6 +34,11 @@ export const UserService = {
         return data
     },
 
+    resetAuthenticator: async (id: string, reason: string) => {
+        const { data } = await apiClient.post(`/user/${id}/reset-authenticator`, { reason })
+        return data
+    },
+
     updateUserStatus: async (id: string, status: "active" | "disabled", reason?: string): Promise<{ ok: boolean; data: any }> => {
         const { data } = await apiClient.put<{ ok: boolean; data: any }>(`/user/updateUser/${id}`, { status, reason })
         return data

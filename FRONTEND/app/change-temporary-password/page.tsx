@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Check, Eye, EyeOff, KeyRound, LockKeyhole, LogOut, ShieldCheck } from 'lucide-react'
 import { AuthService } from '@/services/auth.service'
+import type { TemporaryAuthResponse } from '@/services/auth.service'
 import { useAuthContext } from '@/providers/auth-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -41,7 +42,8 @@ function VisibilityButton({
 
 export default function ChangeTemporaryPasswordPage() {
     const router = useRouter()
-    const { user, isLoading, clearSession, logout } = useAuthContext()
+    const { clearSession } = useAuthContext()
+    const [temporaryAuth, setTemporaryAuth] = useState<TemporaryAuthResponse | null>(null)
     const [currentPassword, setCurrentPassword] = useState('')
     const [newPassword, setNewPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -53,10 +55,20 @@ export default function ChangeTemporaryPasswordPage() {
     const [status, setStatus] = useState('')
 
     useEffect(() => {
-        if (!isLoading && (!user || !user.mustChangePassword)) {
+        const stored = sessionStorage.getItem('finshield_temp_auth')
+        if (!stored) {
+            router.replace('/login')
+            return
+        }
+        try {
+            const parsed = JSON.parse(stored) as TemporaryAuthResponse
+            if (parsed.authState !== 'PASSWORD_CHANGE_REQUIRED' || !parsed.tempToken) throw new Error('invalid state')
+            setTemporaryAuth(parsed)
+        } catch {
+            sessionStorage.removeItem('finshield_temp_auth')
             router.replace('/login')
         }
-    }, [isLoading, router, user])
+    }, [router])
 
     const requirementState = useMemo(
         () => requirements.map((requirement) => ({
@@ -81,12 +93,12 @@ export default function ChangeTemporaryPasswordPage() {
         setStatus('')
         setIsSubmitting(true)
         try {
-            await AuthService.changePassword({
+            if (!temporaryAuth?.tempToken) throw new Error('Temporary authentication session expired')
+            await AuthService.changeTemporaryPassword(temporaryAuth.tempToken, {
                 currentPassword,
                 newPassword,
-                confirmPassword,
             })
-            setStatus('Password changed. Returning you to login…')
+            setStatus('Password changed. Sign in again to continue with MFA…')
             clearSession()
             router.replace('/login')
         } catch (requestError: any) {
@@ -97,6 +109,14 @@ export default function ChangeTemporaryPasswordPage() {
         } finally {
             setIsSubmitting(false)
         }
+    }
+
+    async function cancelTemporarySession() {
+        if (temporaryAuth?.tempToken) {
+            await AuthService.cancelMfaSession(temporaryAuth.tempToken).catch(() => null)
+        }
+        clearSession()
+        router.replace('/login')
     }
 
     return (
@@ -125,7 +145,7 @@ export default function ChangeTemporaryPasswordPage() {
                             The password in your welcome email is temporary. Replace it now before entering FinShield.
                         </p>
                     </div>
-                    <ol className="space-y-5 border-l border-white/15 pl-7" aria-label="Account activation steps">
+                    <ol className="space-y-5 border-l border-white/15 pl-7" aria-label="Account security steps">
                         {[
                             ['01', 'Temporary login', 'Use the credential from your welcome email.'],
                             ['02', 'Private replacement', 'Choose a password only you know.'],
@@ -226,7 +246,7 @@ export default function ChangeTemporaryPasswordPage() {
                                     <ShieldCheck className="mr-2 h-4 w-4" aria-hidden="true" />
                                     {isSubmitting ? 'Changing password…' : 'Change password'}
                                 </Button>
-                                <Button type="button" variant="ghost" disabled={isSubmitting} onClick={() => logout()} className="h-11 w-full text-slate-600 hover:text-slate-900">
+                                <Button type="button" variant="ghost" disabled={isSubmitting} onClick={cancelTemporarySession} className="h-11 w-full text-slate-600 hover:text-slate-900">
                                     <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
                                     Log out instead
                                 </Button>
@@ -312,7 +332,7 @@ export default function ChangeTemporaryPasswordPage() {
                                 type="button"
                                 variant="ghost"
                                 disabled={isSubmitting}
-                                onClick={() => logout()}
+                                onClick={cancelTemporarySession}
                                 className="w-full h-11 text-gray-500 hover:text-gray-700 rounded-xl transition-colors"
                             >
                                 <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />

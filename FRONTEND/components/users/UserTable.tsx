@@ -15,6 +15,7 @@ import { ChevronUp, ChevronDown } from "lucide-react"
 
 import { useState, Fragment } from "react"
 import { DisableUserDialog } from "./DisableUserDialog"
+import { ResetAuthenticatorDialog } from "./ResetAuthenticatorDialog"
 
 
 
@@ -136,6 +137,8 @@ export function UserTable({ users, onUpdateStatus, renderSubComponent, paginatio
                                                         Enable
                                                     </Button>
                                                 )}
+
+                                                {user.totpEnabled && <ResetAuthenticatorDialog user={user} />}
 
                                                 </div>
                                             </TableCell>

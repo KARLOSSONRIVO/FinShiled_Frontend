@@ -9,6 +9,14 @@
 
 ## Variables Reference
 
+## MFA configuration boundary
+
+Mandatory MFA requires no new browser environment variable. Email-code peppers, SMTP credentials, and the TOTP encryption key are backend-only secrets and must never use a `NEXT_PUBLIC_` prefix or appear in this repository. The frontend receives only masked email addresses, safe enrollment flags, pending QR/manual setup material, and short-lived scoped credentials from the API.
+
+## MFA configuration boundary
+
+Mandatory MFA requires no new browser environment variable. Email-code peppers, SMTP credentials, and the TOTP encryption key are backend-only secrets and must never use a `NEXT_PUBLIC_` prefix or appear in this repository. The frontend receives only masked email addresses, safe enrollment flags, pending QR/manual setup material, and short-lived scoped credentials from the API.
+
 ### `NEXT_PUBLIC_API_URL`
 ```
 NEXT_PUBLIC_API_URL=https://your-backend.ngrok-free.dev

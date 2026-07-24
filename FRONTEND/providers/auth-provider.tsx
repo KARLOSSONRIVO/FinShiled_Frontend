@@ -6,7 +6,14 @@ import { useRouter } from "next/navigation"
 import { AuthService } from "@/services/auth.service"
 import type { components } from "@/lib/api-types"
 
-type User = components["schemas"]["User"]
+type User = components["schemas"]["User"] & {
+    emailVerified?: boolean
+    mfaEnabled?: boolean
+    defaultMfaMethod?: "email" | "authenticator"
+    enabledMfaMethods?: Array<"email" | "authenticator">
+    mfaActivatedAt?: string | null
+    totpEnabled?: boolean
+}
 type LoginRequest = Parameters<typeof AuthService.login>[0]
 
 interface AuthContextType {
@@ -17,9 +24,7 @@ interface AuthContextType {
     logout: () => Promise<void>
     clearSession: () => void
     refreshUser: () => Promise<void>
-    verifyMfaLogin: (tempToken: string, token: string) => Promise<void>
-    enableMfa: (token: string) => Promise<void>
-    disableMfa: (password: string) => Promise<void>
+    completeMfaAuthentication: (response: any) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -76,6 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (refreshToken) {
                 localStorage.setItem("refreshToken", refreshToken)
             }
+            sessionStorage.removeItem("finshield_temp_auth")
 
             // Set cookie for middleware
             document.cookie = `token=${accessToken}; path=/; max-age=86400; SameSite=Strict`
@@ -91,13 +97,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(true)
         try {
             const response: any = await AuthService.login(credentials)
-            // Check if MFA is required
-            if (response.data?.mfaRequired || response.mfaRequired) {
-                setIsLoading(false) // Stop loading so UI can show MFA input
-                return {
-                    mfaRequired: true,
-                    tempToken: response.data?.tempToken || response.tempToken
+            const temporary = response.data || response
+            if (temporary?.authState && temporary?.tempToken) {
+                sessionStorage.setItem("finshield_temp_auth", JSON.stringify(temporary))
+                if (temporary.authState === "PASSWORD_CHANGE_REQUIRED") {
+                    router.replace("/change-temporary-password")
+                } else {
+                    router.replace("/mfa")
                 }
+                return temporary
             }
 
             const success = response.success || response.ok || (response.data && (response.data.accessToken || response.data.user))
@@ -113,46 +121,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
-    const verifyMfaLogin = async (tempToken: string, token: string) => {
-        setIsLoading(true)
-        try {
-            const response = await AuthService.verifyMfa({ tempToken, token })
-            handleAuthSuccess(response)
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-    const enableMfa = async (token: string) => {
-        try {
-            await AuthService.enableMfa({ token })
-            if (user) {
-                const updatedUser = { ...user, mfaEnabled: true }
-                setUser(updatedUser)
-                localStorage.setItem("user", JSON.stringify(updatedUser))
-            }
-        } catch (error) {
-            throw error
-        }
-    }
-
-    const disableMfa = async (password: string) => {
-        try {
-            await AuthService.disableMfa({ password })
-            if (user) {
-                const updatedUser = { ...user, mfaEnabled: false }
-                setUser(updatedUser)
-                localStorage.setItem("user", JSON.stringify(updatedUser))
-            }
-        } catch (error) {
-            throw error
-        }
-    }
+    const completeMfaAuthentication = (response: any) => handleAuthSuccess(response)
 
     const clearSession = () => {
         localStorage.removeItem('token')
         localStorage.removeItem('refreshToken')
         localStorage.removeItem('user')
+        sessionStorage.removeItem('finshield_temp_auth')
 
         if (typeof window !== 'undefined') {
             for (let i = localStorage.length - 1; i >= 0; i--) {
@@ -231,9 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             logout,
             clearSession,
             refreshUser,
-            verifyMfaLogin,
-            enableMfa,
-            disableMfa
+            completeMfaAuthentication
         }}>
             {children}
         </AuthContext.Provider>

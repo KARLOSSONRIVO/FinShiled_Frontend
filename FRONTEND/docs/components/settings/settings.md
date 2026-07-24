@@ -35,7 +35,7 @@ Calls the relevant update endpoint (via `UserService` or a dedicated profile end
 ## Security Settings
 Contains:
 - **Change Password** — form calling `AuthService.changePassword()`
-- **MFA Enable/Disable** — toggle described in [auth components docs](../auth/auth.md)
+- **Mandatory MFA** — permanent email status, preferred method, optional authenticator lifecycle, step-up confirmation, and recent activity described in [auth components docs](../auth/auth.md)
 - **Active Sessions** — table of sessions from `sessionService.listActiveSessions()`, with "Revoke" buttons calling `sessionService.revokeSession(id)` and a "Sign out all devices" button calling `sessionService.revokeAllSessions()`
 
 ---

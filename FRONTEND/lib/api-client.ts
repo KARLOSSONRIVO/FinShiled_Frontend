@@ -44,7 +44,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
 }
 
 // Auth endpoints that should NEVER trigger a token refresh cycle
-const AUTH_ENDPOINTS = ["/auth/login", "/auth/refresh", "/auth/logout"]
+const AUTH_ENDPOINTS = ["/auth/login", "/auth/refresh", "/auth/logout", "/auth/temporary", "/auth/mfa"]
 
 apiClient.interceptors.response.use(
     (response) => response,

@@ -1,124 +1,46 @@
-# Auth & Session Services
+# Auth and Session Services
 
-Handles all authentication, MFA, password management, and active session control.
+`services/auth.service.ts` separates three credential scopes:
 
----
+- Normal bearer access for authenticated resources.
+- `X-Temporary-Auth` for password change, login challenge, and settings-email verification.
+- `X-MFA-Step-Up` for a single authorized security-setting action.
 
-## `AuthService` — `services/auth.service.ts`
+## Password and login
 
-### Local Types
+| Method | Endpoint | Result |
+|---|---|---|
+| `login(credentials)` | `POST /auth/login` | Restricted `TemporaryAuthResponse`; never a full session |
+| `changeTemporaryPassword(token, payload)` | `POST /auth/temporary/change-password` | Completes forced change, invalidates temporary state, and requires fresh login |
+| `refreshToken(refreshToken)` | `POST /auth/refresh` | Rotated authenticated token pair |
+| `logout()` | `POST /auth/logout` | Revokes the stored refresh session |
+| `getMe()` | `GET /auth/me` | Safe current-user profile |
+| `changePassword(payload)` | `POST /auth/change-password` | Changes a routine password and invalidates stale auth versions |
 
-```ts
-interface LoginRequest  { email: string; password: string }
+## Login MFA
 
-interface LoginResponse {
-  success: boolean
-  data: { accessToken: string; refreshToken: string; user: { id, email, role, username, status, mfaEnabled } }
-}
-```
+| Method | Endpoint |
+|---|---|
+| `getMfaMethods(tempToken)` | `GET /auth/mfa/methods` |
+| `selectMfaMethod(tempToken, method)` | `POST /auth/mfa/methods/select` |
+| `requestEmailCode(tempToken)` | `POST /auth/mfa/email/request` |
+| `verifyMfa(tempToken, { code, method })` | `POST /auth/mfa/verify` |
+| `cancelMfaSession(tempToken)` | `POST /auth/mfa/session/cancel` |
 
-### Methods
+Email is always included. `authenticator` is offered only when the backend reports it in `enabledMfaMethods`.
 
-#### `login(credentials)`
-```ts
-AuthService.login(credentials: LoginRequest): Promise<LoginResponse>
-```
-`POST /auth/login` — Authenticates a user with email + password.
+## MFA settings step-up
 
-Returns either a full `LoginResponse` (tokens + user), or a partial MFA-challenge response with `{ mfaRequired: true, tempToken: string }` when MFA is enabled. The `AuthProvider` handles both branches.
+| Method | Purpose |
+|---|---|
+| `getMfaSettings()` | Safe status and recent activity |
+| `authorizeMfaSetting({ password, action })` | Confirm the password and send an email challenge |
+| `verifyMfaSettingAuthorization(tempToken, code)` | Receive an action-scoped step-up credential |
+| `startAuthenticatorSetup(stepUpToken)` | Receive pending QR/manual setup material |
+| `completeAuthenticatorSetup(stepUpToken, code)` | Prove possession and activate encrypted TOTP |
+| `removeAuthenticator(stepUpToken)` | Remove TOTP while preserving email MFA |
+| `changePreferredMfaMethod(stepUpToken, method)` | Prefer an already enabled method |
 
----
+There is intentionally no operation that turns MFA off.
 
-#### `refreshToken(refreshToken)`
-```ts
-AuthService.refreshToken(refreshToken: string): Promise<RefreshResponse>
-```
-`POST /auth/refresh` — Exchanges an expiring refresh token for a new access + refresh token pair.
-
-> [!NOTE]
-> This is **not called manually** in the app. The `apiClient` response interceptor handles silent token refresh automatically on any `401` response.
-
----
-
-#### `logout()`
-```ts
-AuthService.logout(): Promise<void>
-```
-`POST /auth/logout` — Invalidates the current refresh token on the server.
-
-Reads `refreshToken` from `localStorage` and sends it in the request body. If no refresh token is found, the call is skipped (graceful degradation). The `AuthProvider.logout()` clears local storage and cookies regardless.
-
----
-
-#### `getMe()`
-```ts
-AuthService.getMe(): Promise<any>
-```
-`GET /auth/me` — Returns the authenticated user's profile. Used on app startup by `AuthProvider` to validate a stored token and rehydrate session state.
-
----
-
-#### `changePassword(payload)`
-```ts
-AuthService.changePassword({ currentPassword, newPassword }): Promise<any>
-```
-`POST /auth/change-password` — Changes the authenticated user's password. Triggered by the forced password change dialog when `user.mustChangePassword === true`.
-
----
-
-#### `verifyMfa(payload)`
-```ts
-AuthService.verifyMfa({ tempToken, token }): Promise<any>
-```
-`POST /auth/login/mfa` — Submits a TOTP code to complete MFA login. Requires a `tempToken` issued during the initial `login()` call.
-
----
-
-#### `setupMfa()`
-```ts
-AuthService.setupMfa(): Promise<any>
-```
-`POST /auth/mfa/setup` — Initiates MFA setup, returning a QR code URI and backup codes.
-
----
-
-#### `enableMfa(payload)`
-```ts
-AuthService.enableMfa({ token }): Promise<any>
-```
-`POST /auth/mfa/enable` — Confirms MFA setup by verifying the first TOTP code from the authenticator app.
-
----
-
-#### `disableMfa(payload)`
-```ts
-AuthService.disableMfa({ password }): Promise<any>
-```
-`POST /auth/mfa/disable` — Disables MFA after verifying the user's current password.
-
----
-
-## `sessionService` — `services/session.service.ts`
-
-Manages the user's active login sessions (devices/browsers).
-
-### Types
-
-```ts
-interface SessionItem {
-  id: string
-  userId: string
-  userAgent: string
-  createdAt: string
-  expiresAt: string
-}
-```
-
-### Methods
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `listActiveSessions()` | `GET /session` | Returns all active sessions for the current user |
-| `getSessionCount()` | `GET /session/count` | Returns `{ count: number }` of active sessions |
-| `revokeSession(sessionId)` | `DELETE /session/:id` | Revokes one specific session |
-| `revokeAllSessions()` | `DELETE /session/all` | Signs out all other devices |
+`session.service.ts` continues to list and revoke authenticated refresh sessions. Temporary authentication sessions are controlled through the MFA service and are not dashboard sessions.

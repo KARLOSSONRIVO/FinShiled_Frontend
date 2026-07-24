@@ -21,6 +21,13 @@ export interface User extends SchemaUser {
     lastLoginAt?: string;
     /** Whether access is limited to completing the temporary-password handoff. */
     mustChangePassword?: boolean;
+    emailVerified?: boolean;
+    emailVerifiedAt?: string | null;
+    mfaEnabled?: boolean;
+    defaultMfaMethod?: "email" | "authenticator";
+    enabledMfaMethods?: Array<"email" | "authenticator">;
+    mfaActivatedAt?: string | null;
+    totpEnabled?: boolean;
     /** Latest welcome-email delivery state. */
     welcomeEmailStatus?: "pending" | "sent" | "failed";
     /** Child users managed by this user (e.g. employees of a manager) */

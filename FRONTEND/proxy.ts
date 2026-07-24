@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-const publicPaths = ['/login', '/forgot-password', '/change-temporary-password', '/']
+const publicPaths = ['/login', '/forgot-password', '/change-temporary-password', '/mfa', '/']
 
 export function proxy(request: NextRequest) {
     const token = request.cookies.get("token")?.value

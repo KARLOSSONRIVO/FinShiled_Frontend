@@ -1,204 +1,173 @@
 "use client"
 
-import { useState } from "react"
-import { useAuth } from "@/hooks/global/use-auth"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Lock, Smartphone, CheckCircle, AlertTriangle } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { CheckCircle, Copy, Loader2, Mail, ShieldCheck, Smartphone } from "lucide-react"
 import { toast } from "sonner"
-import { AuthService } from "@/services/auth.service"
+import { AuthService, type MfaMethod } from "@/services/auth.service"
+import { useAuthContext } from "@/providers/auth-provider"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import { Label } from "@/components/ui/label"
+
+type Action = "ADD_AUTHENTICATOR" | "REMOVE_AUTHENTICATOR" | "CHANGE_PREFERRED_METHOD"
+type Stage = "password" | "email" | "authenticator"
+
+const unwrap = (response: any) => response?.data || response
 
 export function MFASettings() {
-    const { user, enableMfa, disableMfa } = useAuth()
-    const [isLoading, setIsLoading] = useState(false)
-
-    // Setup State
-    const [setupOpen, setSetupOpen] = useState(false)
-    const [qrCode, setQrCode] = useState<string | null>(null)
-    const [secret, setSecret] = useState<string | null>(null)
-    const [otp, setOtp] = useState("")
-
-    // Disable State
-    const [disableOpen, setDisableOpen] = useState(false)
+    const router = useRouter()
+    const { clearSession, refreshUser } = useAuthContext()
+    const [settings, setSettings] = useState<any>(null)
+    const [loading, setLoading] = useState(true)
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [action, setAction] = useState<Action>("ADD_AUTHENTICATOR")
+    const [stage, setStage] = useState<Stage>("password")
     const [password, setPassword] = useState("")
+    const [code, setCode] = useState("")
+    const [tempToken, setTempToken] = useState("")
+    const [stepUpToken, setStepUpToken] = useState("")
+    const [preferredTarget, setPreferredTarget] = useState<MfaMethod>("email")
+    const [setup, setSetup] = useState<{ qrCodeUrl: string; manualKey: string } | null>(null)
 
-    const handleStartSetup = async () => {
-        setIsLoading(true)
+    async function loadSettings() {
+        setLoading(true)
         try {
-            const response = await AuthService.setupMfa()
-            if (response.data) {
-                setQrCode(response.data.qrCodeUrl)
-                setSecret(response.data.secret)
-                setSetupOpen(true)
+            setSettings(unwrap(await AuthService.getMfaSettings()))
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "MFA settings could not be loaded")
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => { void loadSettings() }, [])
+
+    function begin(nextAction: Action, method?: MfaMethod) {
+        setAction(nextAction)
+        setPreferredTarget(method || "email")
+        setStage("password")
+        setPassword("")
+        setCode("")
+        setTempToken("")
+        setStepUpToken("")
+        setSetup(null)
+        setDialogOpen(true)
+    }
+
+    async function confirmPassword() {
+        if (!password) return
+        setLoading(true)
+        try {
+            const data = unwrap(await AuthService.authorizeMfaSetting({ password, action }))
+            setTempToken(data.tempToken)
+            setStage("email")
+            setCode("")
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "Password confirmation failed")
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    async function finishAndReload(message: string) {
+        setDialogOpen(false)
+        toast.success(message)
+        await Promise.all([loadSettings(), refreshUser()])
+    }
+
+    async function requireFreshLogin(message: string) {
+        setDialogOpen(false)
+        toast.success(message)
+        clearSession()
+        router.replace("/login")
+    }
+
+    async function confirmEmail() {
+        if (!tempToken || code.length !== 6) return
+        setLoading(true)
+        try {
+            const authorization = unwrap(await AuthService.verifyMfaSettingAuthorization(tempToken, code))
+            const token = authorization.stepUpToken
+            setStepUpToken(token)
+            setCode("")
+
+            if (action === "ADD_AUTHENTICATOR") {
+                setSetup(unwrap(await AuthService.startAuthenticatorSetup(token)))
+                setStage("authenticator")
+            } else if (action === "REMOVE_AUTHENTICATOR") {
+                await AuthService.removeAuthenticator(token)
+                await requireFreshLogin("Authenticator removed. Sign in again with email verification.")
             } else {
-                toast.error("Failed to start MFA setup")
+                await AuthService.changePreferredMfaMethod(token, preferredTarget)
+                await finishAndReload(`Preferred method changed to ${preferredTarget === "email" ? "email" : "authenticator"}`)
             }
         } catch (error: any) {
-            toast.error(error.message || "Failed to generate MFA secret")
+            setCode("")
+            toast.error(error?.response?.data?.message || "Email verification failed")
         } finally {
-            setIsLoading(false)
+            setLoading(false)
         }
     }
 
-    const handleEnableMfa = async () => {
-        if (!otp || otp.length < 6) {
-            toast.error("Please enter a valid 6-digit code")
-            return
-        }
-        setIsLoading(true)
+    async function confirmAuthenticator() {
+        if (!stepUpToken || code.length !== 6) return
+        setLoading(true)
         try {
-            await enableMfa(otp)
-            toast.success("MFA enabled successfully")
-            setSetupOpen(false)
-            setOtp("")
+            await AuthService.completeAuthenticatorSetup(stepUpToken, code)
+            await finishAndReload("Authenticator application added")
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to verify MFA code")
+            setCode("")
+            toast.error(error?.response?.data?.message || "Authenticator code was not accepted")
         } finally {
-            setIsLoading(false)
+            setLoading(false)
         }
     }
 
-    const handleDisableMfa = async () => {
-        if (!password) {
-            toast.error("Please enter your password")
-            return
-        }
-        setIsLoading(true)
-        try {
-            await disableMfa(password)
-            toast.success("MFA disabled successfully")
-            setDisableOpen(false)
-            setPassword("")
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to disable MFA")
-        } finally {
-            setIsLoading(false)
-        }
+    if (loading && !settings) {
+        return <div className="grid min-h-56 place-items-center rounded-xl border bg-card"><Loader2 className="h-6 w-6 animate-spin text-emerald-600" /></div>
     }
+
+    const totpEnabled = Boolean(settings?.totpEnabled)
 
     return (
-        <div className="p-6 border rounded-xl bg-card text-card-foreground shadow-sm space-y-6">
+        <div className="space-y-6 rounded-xl border bg-card p-4 text-card-foreground shadow-sm sm:p-6">
             <div>
-                <h4 className="font-semibold text-lg flex items-center gap-2">
-                    <Smartphone className="h-5 w-5 text-emerald-500" />
-                    Multi-Factor Authentication (MFA)
-                </h4>
-                <p className="text-sm text-muted-foreground mt-1">
-                    Add an extra layer of security to your account by requiring a code from your authenticator app.
-                </p>
+                <h4 className="flex items-center gap-2 text-lg font-semibold"><ShieldCheck className="h-5 w-5 text-emerald-600" />Multi-Factor Authentication</h4>
+                <p className="mt-1 text-sm text-muted-foreground">MFA is required and cannot be turned off.</p>
             </div>
 
-            <div className="flex items-center justify-between bg-muted/50 p-4 rounded-lg">
-                <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${user?.mfaEnabled ? 'bg-emerald-100 text-emerald-600' : 'bg-yellow-100 text-yellow-600'}`}>
-                        {user?.mfaEnabled ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
-                    </div>
-                    <div>
-                        <p className="font-medium text-sm">Status: {user?.mfaEnabled ? "Enabled" : "Disabled"}</p>
-                        <p className="text-xs text-muted-foreground">
-                            {user?.mfaEnabled ? "Your account is secured with 2FA." : "Enable 2FA to protect your account."}
-                        </p>
+            <div className="space-y-3">
+                <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:bg-emerald-950/20">
+                    <div className="flex min-w-0 items-center gap-3"><Mail className="h-5 w-5 shrink-0 text-emerald-700" /><div><p className="text-sm font-semibold">Email verification</p><p className="truncate text-xs text-muted-foreground">{settings?.maskedEmail} · permanent fallback</p></div></div>
+                    <span className="flex items-center gap-1 text-xs font-semibold text-emerald-700"><CheckCircle className="h-4 w-4" />Enabled</span>
+                </div>
+                <div className="flex flex-col gap-3 rounded-xl bg-muted/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3"><Smartphone className="h-5 w-5 text-slate-600" /><div><p className="text-sm font-semibold">Authenticator application</p><p className="text-xs text-muted-foreground">Google Authenticator, Microsoft Authenticator, or Authy</p></div></div>
+                    <div className="flex flex-wrap gap-2">
+                        {totpEnabled ? <Button size="sm" variant="destructive" onClick={() => begin("REMOVE_AUTHENTICATOR")}>Remove</Button> : <Button size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700" onClick={() => begin("ADD_AUTHENTICATOR")}>Add authenticator</Button>}
                     </div>
                 </div>
-
-                {user?.mfaEnabled ? (
-                    <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => setDisableOpen(true)}
-                    >
-                        Turn Off
-                    </Button>
-                ) : (
-                    <Button
-                        onClick={handleStartSetup}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                        size="sm"
-                        disabled={isLoading}
-                    >
-                        {isLoading ? "Loading..." : "Turn On"}
-                    </Button>
-                )}
             </div>
 
-            {/* Setup Modal */}
-            <Dialog open={setupOpen} onOpenChange={setSetupOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Setup Authenticator</DialogTitle>
-                        <DialogDescription>
-                            Scan the QR code with your authenticator app (e.g., Google Authenticator, Authy).
-                        </DialogDescription>
-                    </DialogHeader>
+            <div className="rounded-xl border p-4">
+                <p className="text-sm font-semibold">Preferred login method</p>
+                <p className="mt-1 text-xs text-muted-foreground">The other enabled method remains available under More options.</p>
+                <div className="mt-3 flex gap-2">
+                    <Button size="sm" variant={settings?.defaultMfaMethod === "email" ? "default" : "outline"} onClick={() => settings?.defaultMfaMethod !== "email" && begin("CHANGE_PREFERRED_METHOD", "email")}>Email</Button>
+                    {totpEnabled && <Button size="sm" variant={settings?.defaultMfaMethod === "authenticator" ? "default" : "outline"} onClick={() => settings?.defaultMfaMethod !== "authenticator" && begin("CHANGE_PREFERRED_METHOD", "authenticator")}>Authenticator</Button>}
+                </div>
+            </div>
 
-                    <div className="flex flex-col items-center gap-4 py-4">
-                        {qrCode ? (
-                            <img src={qrCode} alt="MFA QR Code" className="w-48 h-48 border rounded-lg" />
-                        ) : (
-                            <div className="w-48 h-48 bg-gray-100 flex items-center justify-center rounded-lg animate-pulse" />
-                        )}
-
-                        {secret && (
-                            <div className="text-center">
-                                <p className="text-xs text-muted-foreground mb-1">Or enter this code manually:</p>
-                                <code className="bg-muted px-2 py-1 rounded text-sm font-mono select-all">
-                                    {secret}
-                                </code>
-                            </div>
-                        )}
-
-                        <div className="w-full max-w-xs space-y-2 mt-2">
-                            <Label htmlFor="otp">Enter 6-digit Code</Label>
-                            <Input
-                                id="otp"
-                                placeholder="000000"
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value)}
-                                maxLength={6}
-                                className="text-center text-lg tracking-widest"
-                            />
-                        </div>
-                    </div>
-
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setSetupOpen(false)}>Cancel</Button>
-                        <Button onClick={handleEnableMfa} disabled={isLoading || otp.length !== 6}>
-                            {isLoading ? "Verifying..." : "Verify & Enable"}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-            {/* Disable Modal */}
-            <Dialog open={disableOpen} onOpenChange={setDisableOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Disable MFA</DialogTitle>
-                        <DialogDescription>
-                            Please enter your password to confirm disabling Multi-Factor Authentication.
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="password">Current Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setDisableOpen(false)}>Cancel</Button>
-                        <Button variant="destructive" onClick={handleDisableMfa} disabled={isLoading || !password}>
-                            {isLoading ? "Disabling..." : "Disable MFA"}
-                        </Button>
-                    </DialogFooter>
+            <Dialog open={dialogOpen} onOpenChange={(open) => !loading && setDialogOpen(open)}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader><DialogTitle>{stage === "password" ? "Confirm your password" : stage === "email" ? "Verify through email" : "Connect authenticator"}</DialogTitle><DialogDescription>Sensitive MFA changes require your password and a fresh email verification.</DialogDescription></DialogHeader>
+                    {stage === "password" && <div className="space-y-2 py-3"><Label htmlFor="mfa-password">Current password</Label><Input id="mfa-password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} /></div>}
+                    {stage === "email" && <div className="space-y-4 py-3"><p className="text-sm text-muted-foreground">Enter the 6-digit code sent to {settings?.maskedEmail}.</p><div className="flex justify-center"><InputOTP maxLength={6} value={code} onChange={setCode} disabled={loading}><InputOTPGroup>{Array.from({ length: 6 }, (_, index) => <InputOTPSlot key={index} index={index} />)}</InputOTPGroup></InputOTP></div></div>}
+                    {stage === "authenticator" && setup && <div className="space-y-4 py-3"><div className="mx-auto w-fit rounded-xl border bg-white p-2"><img src={setup.qrCodeUrl} alt="Authenticator setup QR code" className="h-44 w-44" /></div><div className="rounded-lg bg-muted p-3"><p className="text-xs text-muted-foreground">Manual setup key</p><div className="mt-1 flex items-center justify-between gap-2"><code className="break-all text-xs">{setup.manualKey}</code><button type="button" aria-label="Copy manual setup key" onClick={() => navigator.clipboard.writeText(setup.manualKey).then(() => toast.success("Setup key copied"))}><Copy className="h-4 w-4" /></button></div></div><div className="flex justify-center"><InputOTP maxLength={6} value={code} onChange={setCode} disabled={loading}><InputOTPGroup>{Array.from({ length: 6 }, (_, index) => <InputOTPSlot key={index} index={index} />)}</InputOTPGroup></InputOTP></div></div>}
+                    <DialogFooter><Button variant="outline" disabled={loading} onClick={() => setDialogOpen(false)}>Cancel</Button><Button disabled={loading || (stage === "password" ? !password : code.length !== 6)} onClick={stage === "password" ? confirmPassword : stage === "email" ? confirmEmail : confirmAuthenticator}>{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{stage === "password" ? "Send email code" : stage === "email" ? "Verify email" : "Verify and enable"}</Button></DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>
