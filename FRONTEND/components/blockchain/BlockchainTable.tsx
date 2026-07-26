@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import {
     Table,
     TableBody,
@@ -9,7 +10,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import type { LedgerInvoice } from "@/lib/types"
-import { ChevronUp, ChevronDown } from "lucide-react"
+import { Check, ChevronUp, ChevronDown, Copy } from "lucide-react"
 
 interface BlockchainTableProps {
     invoices: LedgerInvoice[]
@@ -19,6 +20,14 @@ interface BlockchainTableProps {
 }
 
 export function BlockchainTable({ invoices, sortBy, order, onSort }: BlockchainTableProps) {
+    const [copiedHash, setCopiedHash] = useState<string | null>(null)
+
+    const copyTransactionHash = async (transactionHash: string) => {
+        await navigator.clipboard.writeText(transactionHash)
+        setCopiedHash(transactionHash)
+        window.setTimeout(() => setCopiedHash(null), 2000)
+    }
+
     return (
         <div className="rounded-xl border border-border bg-card shadow-sm px-3 py-2 overflow-x-auto">
             <Table>
@@ -61,8 +70,29 @@ export function BlockchainTable({ invoices, sortBy, order, onSort }: BlockchainT
                                 <TableCell className="px-6 text-center font-bold text-base text-foreground">
                                     {row.company || '—'}
                                 </TableCell>
-                                <TableCell className="px-6 text-center text-sm text-muted-foreground max-w-[220px] truncate mx-auto">
-                                    {row.transactionHash || "—"}
+                                <TableCell className="px-6 text-sm text-muted-foreground">
+                                    {row.transactionHash ? (
+                                        <div className="flex items-center justify-center gap-2">
+                                            <span className="block max-w-[220px] truncate" title={row.transactionHash}>
+                                                {row.transactionHash}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => copyTransactionHash(row.transactionHash)}
+                                                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                                aria-label={copiedHash === row.transactionHash ? "Transaction hash copied" : "Copy transaction hash"}
+                                                title={copiedHash === row.transactionHash ? "Copied!" : "Copy transaction hash"}
+                                            >
+                                                {copiedHash === row.transactionHash ? (
+                                                    <Check className="h-4 w-4 text-emerald-600" />
+                                                ) : (
+                                                    <Copy className="h-4 w-4" />
+                                                )}
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <span className="block text-center">—</span>
+                                    )}
                                 </TableCell>
                                 <TableCell className="px-6 text-center font-bold text-base text-foreground">
                                     {row.anchoredAt ? new Date(row.anchoredAt).toLocaleString() : "—"}
