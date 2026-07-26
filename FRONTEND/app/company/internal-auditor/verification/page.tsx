@@ -245,7 +245,7 @@ export default function VerificationWorkspace() {
                     <Button onClick={() => router.push("/company/internal-auditor")} variant="outline" className="gap-2">
                         <ArrowLeft className="h-4 w-4" /> Back to Queue
                     </Button>
-                    <Button onClick={() => router.push("/company/internal-auditor/audit-logs")} className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Button onClick={() => router.push("/company/internal-auditor/review-history")} className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
                         View Audit Logs <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>
@@ -426,7 +426,7 @@ export default function VerificationWorkspace() {
                         {meta?.blockchainHash === null && (
                             <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                                 <Clock className="h-3.5 w-3.5 shrink-0" />
-                                Not yet anchored to blockchain ledger
+                                Not yet anchored to blockchain transactions
                             </div>
                         )}
                     </div>
@@ -477,7 +477,7 @@ export default function VerificationWorkspace() {
                                 className="gap-2 h-10 border-amber-300 text-amber-700 hover:bg-amber-50"
                             >
                                 <AlertTriangle className="h-4 w-4" />
-                                Escalate to Superadmin
+                                Escalate to Owner
                             </Button>
                         </div>
 

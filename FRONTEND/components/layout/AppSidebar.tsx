@@ -43,9 +43,10 @@ interface AppSidebarProps {
     collapsed: boolean
     setCollapsed: (collapsed: boolean) => void
     title?: string
+    showSignOut?: boolean
 }
 
-export function AppSidebar({ links, collapsed, setCollapsed, title = "FinShield" }: AppSidebarProps) {
+export function AppSidebar({ links, collapsed, setCollapsed, title = "FinShield", showSignOut = true }: AppSidebarProps) {
     const pathname = usePathname()
     const { logout } = useAuth()
     const [showLogoutDialog, setShowLogoutDialog] = useState(false)
@@ -135,9 +136,8 @@ export function AppSidebar({ links, collapsed, setCollapsed, title = "FinShield"
                     })}
                 </nav>
 
-                {/* Footer / Sign Out (Commented out per user request) */}
-                {/* 
-                <div className="p-4 border-t border-border mt-auto">
+                {/* Footer / Sign Out */}
+                {showSignOut && <div className="p-4 border-t border-border mt-auto">
                     <button
                         onClick={() => setShowLogoutDialog(true)}
                         className={cn(
@@ -154,8 +154,7 @@ export function AppSidebar({ links, collapsed, setCollapsed, title = "FinShield"
                             Sign out
                         </span>
                     </button>
-                </div>
-                */}
+                </div>}
             </aside>
 
             {/* Mobile Drawer Navigation */}
@@ -224,9 +223,8 @@ export function AppSidebar({ links, collapsed, setCollapsed, title = "FinShield"
                                 })}
                             </nav>
 
-                            {/* Footer / Sign Out (Commented out per user request) */}
-                            {/* 
-                            <div className="p-4 border-t border-border mt-auto">
+                            {/* Footer / Sign Out */}
+                            {showSignOut && <div className="p-4 border-t border-border mt-auto">
                                 <button
                                     onClick={() => {
                                         setCollapsed(true)
@@ -241,15 +239,14 @@ export function AppSidebar({ links, collapsed, setCollapsed, title = "FinShield"
                                         Sign out
                                     </span>
                                 </button>
-                            </div>
-                            */}
+                            </div>}
                         </div>
                     </DrawerContent>
                 </Drawer>
             </div>
 
             {/* Confirm Sign Out Dialog */}
-            <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+            {showSignOut && <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Sign out?</AlertDialogTitle>
@@ -267,7 +264,7 @@ export function AppSidebar({ links, collapsed, setCollapsed, title = "FinShield"
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
-            </AlertDialog>
+            </AlertDialog>}
         </>
     )
 }

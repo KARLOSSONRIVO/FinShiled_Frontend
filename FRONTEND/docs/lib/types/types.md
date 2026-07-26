@@ -71,7 +71,7 @@ interface PaginationQuery {
 | `InvoiceDetail` | Full invoice detail page (includes AI analysis + blockchain + review) |
 | `ReviewPayload` | Request body for `InvoiceService.submitReview()` |
 | `ReviewResponse` | Response from `submitReview()` — includes `isUpdate` flag |
-| `LedgerInvoice` | Row in the blockchain ledger view |
+| `BlockchainTransaction` | Row in the blockchain transactions view |
 | `Invoice` | Alias for `ListInvoice` (primary invoice type) |
 
 ### Key field notes
@@ -97,7 +97,7 @@ interface User extends SchemaUser {
   disableReason?: string
 }
 
-type Role       = User['role']    // 'SUPER_ADMIN' | 'ADMINISTRATOR' | 'AUDITOR' | 'REGULATOR' | 'COMPANY_MANAGER' | 'COMPANY_USER'
+type Role       = User['role']    // 'OWNER' | 'ADMINISTRATOR' | 'AUDITOR' | 'REGULATOR' | 'COMPANY_MANAGER' | 'COMPANY_USER'
 type UserStatus = User['status']  // 'active' | 'disabled'
 ```
 

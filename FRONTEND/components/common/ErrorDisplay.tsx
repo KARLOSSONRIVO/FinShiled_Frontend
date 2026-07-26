@@ -20,12 +20,12 @@ export function ErrorDisplay({
     description = "An unexpected error occurred while loading this section of the dashboard."
 }: ErrorDisplayProps) {
     const router = useRouter()
-    const { user, isSuperAdmin } = useAuth()
+    const { user, isOwner } = useAuth()
 
     const getHomePath = () => {
         if (!user) return "/"
         switch (user.role) {
-            case "SUPER_ADMIN": return "/admin/superadmin"
+            case "OWNER": return "/admin/owner"
             case "AUDITOR": return "/admin/external-auditor"
             case "REGULATOR": return "/admin/regulator"
             case "COMPANY_MANAGER": return "/company/manager"
@@ -54,7 +54,7 @@ export function ErrorDisplay({
                             ID: {error.digest}
                         </div>
                     )}
-                    {(isSuperAdmin || process.env.NODE_ENV === 'development') && (
+                    {(isOwner || process.env.NODE_ENV === 'development') && (
                         <div className="text-left bg-destructive/5 p-3 rounded border border-destructive/10 max-h-[150px] overflow-auto">
                             <p className="text-xs font-semibold text-destructive mb-1">Developer Error Log:</p>
                             <code className="text-[10px] text-destructive/80 whitespace-pre-wrap">

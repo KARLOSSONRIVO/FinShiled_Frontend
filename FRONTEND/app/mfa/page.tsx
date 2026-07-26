@@ -9,6 +9,7 @@ import { AuthService, type MfaMethod, type TemporaryAuthResponse } from "@/servi
 import { useAuthContext } from "@/providers/auth-provider"
 import { Button } from "@/components/ui/button"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog"
 
 type View = "methods" | "email" | "authenticator"
 
@@ -19,6 +20,7 @@ export default function MfaPage() {
     const [view, setView] = useState<View>("methods")
     const [code, setCode] = useState("")
     const [busy, setBusy] = useState(false)
+    const [sendingEmail, setSendingEmail] = useState(false)
     const [moreOpen, setMoreOpen] = useState(false)
     const [resendAt, setResendAt] = useState(0)
     const [now, setNow] = useState(Date.now())
@@ -70,6 +72,7 @@ export default function MfaPage() {
     async function chooseMethod(method: MfaMethod) {
         if (!auth) return
         setBusy(true)
+        setSendingEmail(method === "email" && auth.selectedMethod !== method)
         setCode("")
         try {
             if (auth.selectedMethod !== method) {
@@ -85,6 +88,7 @@ export default function MfaPage() {
             toast.error(error?.response?.data?.message || "Authentication method could not be selected")
         } finally {
             setBusy(false)
+            setSendingEmail(false)
         }
     }
 
@@ -114,6 +118,7 @@ export default function MfaPage() {
     async function resend() {
         if (!auth || resendSeconds > 0) return
         setBusy(true)
+        setSendingEmail(true)
         try {
             const response = await AuthService.requestEmailCode(auth.tempToken)
             const data = response.data || response
@@ -124,6 +129,7 @@ export default function MfaPage() {
             toast.error(error?.response?.data?.message || "A new code could not be sent")
         } finally {
             setBusy(false)
+            setSendingEmail(false)
         }
     }
 
@@ -139,6 +145,24 @@ export default function MfaPage() {
 
     return (
         <main className="min-h-screen bg-[#f5f5f0] text-[#17201d]">
+            <Dialog open={sendingEmail}>
+                <DialogContent
+                    showCloseButton={false}
+                    aria-busy="true"
+                    onEscapeKeyDown={(event) => event.preventDefault()}
+                    onPointerDownOutside={(event) => event.preventDefault()}
+                    className="max-w-sm rounded-[24px] border-emerald-950/10 bg-white px-8 py-9 text-center shadow-[0_30px_90px_rgba(16,23,20,0.24)]"
+                >
+                    <div className="relative mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-700">
+                        <span aria-hidden="true" className="absolute inset-0 animate-spin rounded-full border-2 border-emerald-100 border-t-emerald-500 motion-reduce:animate-none" />
+                        <Mail className="h-7 w-7" aria-hidden="true" />
+                    </div>
+                    <DialogTitle className="text-center text-xl leading-tight text-[#17201d]">Sending verification email</DialogTitle>
+                    <DialogDescription className="text-center leading-6 text-slate-600">
+                        Please wait while we securely deliver your verification code.
+                    </DialogDescription>
+                </DialogContent>
+            </Dialog>
             <div className="mx-auto grid min-h-screen max-w-7xl lg:grid-cols-[0.82fr_1.18fr]">
                 <aside className="hidden bg-[#101714] p-12 text-white lg:flex lg:flex-col lg:justify-between xl:p-16">
                     <Image src="/assets/image/FinShield.svg" alt="FinShield" width={112} height={112} className="h-24 w-auto self-center" priority />

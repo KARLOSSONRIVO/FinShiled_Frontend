@@ -28,7 +28,7 @@ Role-aware navigation sidebar. Menu items are conditionally rendered based on `u
 **Role → Nav Items mapping:**
 | Role | Key Nav Items |
 |------|--------------|
-| `SUPER_ADMIN` | Dashboard, Users, Organizations, Assignments, Audit Logs, Blockchain, Policy, Terms |
+| `OWNER` | Dashboard, Users, Organizations, Assignments, Audit Logs, Blockchain, Policy, Terms |
 | `ADMINISTRATOR` | Dashboard, Users, Organizations, Assignments |
 | `AUDITOR` | Dashboard, Invoices, Assignments |
 | `REGULATOR` | Dashboard, Invoices, Blockchain |

@@ -59,7 +59,7 @@ interface CreateUserRequest {
   email: string
   password: string
   username: string
-  role: 'SUPER_ADMIN' | 'AUDITOR' | 'REGULATOR' | 'COMPANY_MANAGER' | 'COMPANY_USER'
+  role: 'OWNER' | 'AUDITOR' | 'REGULATOR' | 'COMPANY_MANAGER' | 'COMPANY_USER'
   orgId?: string   // Required for COMPANY_MANAGER and COMPANY_USER
 }
 ```
@@ -116,7 +116,7 @@ Valid `sortBy` values: `createdAt` | `assignedAt` | `status`
 
 ## `policyService` — `services/policy.service.ts`
 
-CRUD for compliance policy documents. Managed by SUPER_ADMIN / ADMIN roles.
+CRUD for compliance policy documents. Managed by OWNER / ADMIN roles.
 
 ### Types
 

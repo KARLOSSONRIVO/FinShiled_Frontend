@@ -88,7 +88,7 @@ export function useManagerEmployees() {
     })
 
     const regenerateMutation = useMutation({
-        mutationFn: (userId: string) => UserService.regenerateTemporaryPassword(userId),
+        mutationFn: ({ userId, confirmation }: { userId: string; confirmation: string }) => UserService.regenerateTemporaryPassword(userId, confirmation),
         onSuccess: (response) => {
             queryClient.invalidateQueries({ queryKey: ['manager-employees'] })
             if (response.data.welcomeEmail.status === 'sent') {
@@ -108,8 +108,8 @@ export function useManagerEmployees() {
     }
 
     const updateStatusMutation = useMutation({
-        mutationFn: ({ id, status, reason }: { id: string; status: "ACTIVE" | "INACTIVE"; reason?: string }) =>
-            UserService.updateUserStatus(id, status === "INACTIVE" ? "disabled" : "active", reason || undefined),
+        mutationFn: ({ id, status, reason, confirmation }: { id: string; status: "ACTIVE" | "INACTIVE"; reason?: string; confirmation: string }) =>
+            UserService.updateUserStatus(id, status === "INACTIVE" ? "disabled" : "active", confirmation, reason || undefined),
         onSuccess: () => {
             toast.success(`Employee status updated successfully`)
             queryClient.invalidateQueries({ queryKey: ["manager-employees"] })
@@ -119,8 +119,8 @@ export function useManagerEmployees() {
         }
     })
 
-    const handleUpdateStatus = (id: string, status: "ACTIVE" | "INACTIVE", reason?: string) => {
-        updateStatusMutation.mutate({ id, status, reason })
+    const handleUpdateStatus = (id: string, status: "ACTIVE" | "INACTIVE", reason: string | undefined, confirmation: string) => {
+        updateStatusMutation.mutate({ id, status, reason, confirmation })
     }
 
     return {
@@ -133,7 +133,7 @@ export function useManagerEmployees() {
         users,
         handleCreateUser,
         handleUpdateStatus,
-        handleRegenerateTemporaryPassword: (userId: string) => regenerateMutation.mutate(userId),
+        handleRegenerateTemporaryPassword: (userId: string, confirmation: string) => regenerateMutation.mutate({ userId, confirmation }),
         isRegeneratingTemporaryPassword: regenerateMutation.isPending,
 
         currentPage,

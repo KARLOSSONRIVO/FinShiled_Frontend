@@ -24,7 +24,7 @@ interface InvoiceDetailViewProps {
     backUrl: string
     backLabel?: string
     /** Pass "external-auditor" to show the Submit Review card instead of Review History */
-    role?: "external-auditor" | "superadmin" | "regulator" | "manager"
+    role?: "external-auditor" | "owner" | "regulator" | "manager"
 }
 
 interface AiCompletePayload {
@@ -475,7 +475,7 @@ export function InvoiceDetailView({ id, backUrl, backLabel = "Back to Invoices",
                             <Link2 className="h-5 w-5" />
                             Blockchain Verification
                         </CardTitle>
-                        <CardDescription>Tamper-proof ledger record</CardDescription>
+                        <CardDescription>Tamper-proof Blockchain Transaction record</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {data.blockchain?.txHash ? (

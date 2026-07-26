@@ -6,11 +6,12 @@ export const useAuth = () => {
 
     return {
         ...context,
-        isSuperAdmin: context.user?.role === "SUPER_ADMIN",
+        isOwner: context.user?.role === "OWNER",
+        isSystemAdmin: context.user?.role === "SYSTEM_ADMIN",
         isAuditor: context.user?.role === "AUDITOR",
         isRegulator: context.user?.role === "REGULATOR",
         isCompanyManager: context.user?.role === "COMPANY_MANAGER",
         isCompanyUser: context.user?.role === "COMPANY_USER",
-        isAdmin: ["SUPER_ADMIN", "AUDITOR", "REGULATOR"].includes(context.user?.role || "")
+        isAdmin: ["OWNER", "SYSTEM_ADMIN", "AUDITOR", "REGULATOR"].includes(context.user?.role || "")
     }
 }

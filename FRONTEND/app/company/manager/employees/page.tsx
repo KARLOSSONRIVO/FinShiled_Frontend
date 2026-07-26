@@ -103,6 +103,7 @@ export default function ManagerEmployeesPage() {
           sortConfig={sortConfig}
           onSort={requestSort}
           onUpdateStatus={handleUpdateStatus}
+          onRegenerateTemporaryPassword={handleRegenerateTemporaryPassword}
         />
       )}
 

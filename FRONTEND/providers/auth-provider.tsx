@@ -173,8 +173,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         switch (user.role as string) {
-            case "SUPER_ADMIN":
-                router.push("/admin/superadmin")
+            case "OWNER":
+                router.push("/admin/owner")
+                break
+            case "SYSTEM_ADMIN":
+                router.push("/admin/system-administrator")
                 break
             case "ADMINISTRATOR":
             case "ADMIN":

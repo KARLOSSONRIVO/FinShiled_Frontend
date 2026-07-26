@@ -83,14 +83,26 @@ export interface ReviewResponse {
     isUpdate: boolean
 }
 
-export interface LedgerInvoice {
+export interface BlockchainTransaction {
     id: string
     _id?: string
+    invoiceReference: string
     invoiceNumber: string
+    organization: string
     company: string
     transactionHash: string
+    blockNumber?: number | null
+    network?: string
+    transactionStatus?: string
+    submittedDate?: string | null
+    confirmedDate?: string | null
+    submittedBy?: string | null
     anchoredAt: string
     status: string
+    technical?: {
+        errorCode?: string | null
+        retrySupported?: boolean
+    }
 }
 
 /** The primary Invoice type used in the frontend (aliased to ListInvoice) */

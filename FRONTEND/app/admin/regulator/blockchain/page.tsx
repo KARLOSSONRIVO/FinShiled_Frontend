@@ -19,7 +19,7 @@ export default function RegulatorBlockchainPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-normal tracking-tight">Ledger Oversight</h2>
+        <h2 className="text-2xl font-normal tracking-tight">Blockchain Transactions Oversight</h2>
       </div>
 
       <div className="flex gap-4">
@@ -35,7 +35,7 @@ export default function RegulatorBlockchainPage() {
           onClick={() => {
             // Simple toggle for now since we don't have a full dropdown UI constructed yet, 
             // but user asked for STYLE match. 
-            // Ideally we'd add the DropdownMenu like in Super Admin, but hook exposes requestSort.
+            // Ideally we'd add the DropdownMenu like in Owner, but hook exposes requestSort.
             // I will implement a basic toggle or just the visual button if time is tight.
             // Actually, I'll assume they want the visual first. I'll make it a dummy or simple sort.
             // Wait, I should do it right. I'll add a simple onClick to toggle sort for 'blockchain_anchoredAt'

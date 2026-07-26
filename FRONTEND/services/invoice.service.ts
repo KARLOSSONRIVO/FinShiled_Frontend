@@ -18,7 +18,7 @@ type ListInvoiceParams = PaginationQuery & { orgId?: string }
 export const InvoiceService = {
     /**
      * GET /invoice/list
-     * Roles: SUPER_ADMIN, REGULATOR, AUDITOR, COMPANY_MANAGER
+     * Roles: OWNER, REGULATOR, AUDITOR, COMPANY_MANAGER
      * Scoping is handled server-side per role.
      */
     list: async (params?: ListInvoiceParams): Promise<PaginatedResponse<ListInvoice>> => {

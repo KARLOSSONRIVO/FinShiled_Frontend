@@ -114,5 +114,5 @@ The following role groups follow the same pattern as above. Their hook files liv
 |------|---------------|----------|
 | `COMPANY_MANAGER` | `hooks/company-manager/` | All company invoices, employee list, company stats |
 | `AUDITOR` | `hooks/auditor/` | Assigned-company invoices, review management |
-| `REGULATOR` | `hooks/regulator/` | Cross-org invoice views, blockchain ledger |
-| `SUPER_ADMIN` | `hooks/super-admin/` | All users, all orgs, all assignments, audit logs |
+| `REGULATOR` | `hooks/regulator/` | Cross-org invoice views, blockchain transactions |
+| `OWNER` | `hooks/owner/` | All users, all orgs, all assignments, audit logs |

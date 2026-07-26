@@ -9,7 +9,7 @@ Audit trail viewing, compliance policy management, and blockchain verification U
 ## Audit Log Components — `components/audit-logs/`
 
 ### Audit Log Table
-Paginated, filterable table of all system audit events. Only accessible by `SUPER_ADMIN`.
+Paginated, filterable table of all system audit events. Only accessible by `OWNER`.
 
 Calls `AuditService.getLogs()` via hook.
 
@@ -46,10 +46,10 @@ Confirmation dialog before calling `policyService.deletePolicy(id)`.
 
 ## Blockchain Components — `components/blockchain/`
 
-### Blockchain Ledger Table
+### Blockchain Transactions Table
 Displays all invoices that have been anchored to the blockchain. Columns: Invoice #, Company, Transaction Hash, Anchored At, Status.
 
-Calls `blockchainService.getLedger()` via hook.
+Calls `blockchainService.getTransactions()` via hook.
 
 **Transaction Hash** is rendered as a truncated, copyable value with a link to the block explorer.
 

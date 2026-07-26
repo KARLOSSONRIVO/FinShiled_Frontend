@@ -9,19 +9,21 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { User, PaginationDetails } from "@/lib/types"
+import { User, PaginationDetails, Organization } from "@/lib/types"
 import { DataPagination } from "../common/DataPagination"
 import { ChevronUp, ChevronDown } from "lucide-react"
 
 import { useState, Fragment } from "react"
 import { DisableUserDialog } from "./DisableUserDialog"
 import { ResetAuthenticatorDialog } from "./ResetAuthenticatorDialog"
+import { AssignRoleDialog } from "./AssignRoleDialog"
+import { ResetTemporaryPasswordDialog } from "./ResetTemporaryPasswordDialog"
 
 
 
 interface UserTableProps {
     users: User[]
-    onUpdateStatus: (userId: string, status: "ACTIVE" | "INACTIVE", reason?: string) => void
+    onUpdateStatus: (userId: string, status: "ACTIVE" | "INACTIVE", reason: string | undefined, confirmation: string) => void
     renderSubComponent?: (user: User) => React.ReactNode
     pagination?: PaginationDetails
     onPageChange?: (page: number) => void
@@ -29,11 +31,15 @@ interface UserTableProps {
     order?: "asc" | "desc"
     onSort?: (field: string) => void
     hideRoleAndOrg?: boolean
+    organizations?: Organization[]
+    onAssignRole?: (userId: string, role: "AUDITOR" | "REGULATOR" | "COMPANY_MANAGER" | "COMPANY_USER", confirmation: string, orgId?: string) => void
+    onRegenerateTemporaryPassword?: (userId: string, confirmation: string) => void
 }
 
-export function UserTable({ users, onUpdateStatus, renderSubComponent, pagination, onPageChange, sortBy, order, onSort, hideRoleAndOrg = false }: UserTableProps) {
+export function UserTable({ users, onUpdateStatus, renderSubComponent, pagination, onPageChange, sortBy, order, onSort, hideRoleAndOrg = false, organizations = [], onAssignRole, onRegenerateTemporaryPassword }: UserTableProps) {
     const [statusUpdate, setStatusUpdate] = useState<{ id: string, status: "ACTIVE" | "INACTIVE" } | null>(null)
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
+    const [roleTarget, setRoleTarget] = useState<User | null>(null)
 
     const toggleRow = (userId: string) => {
         const newExpanded = new Set(expandedRows)
@@ -71,6 +77,9 @@ export function UserTable({ users, onUpdateStatus, renderSubComponent, paginatio
                             <TableHead className="px-6 py-4 text-center text-foreground font-bold text-base">
                                 Status
                             </TableHead>
+                            <TableHead className="px-6 py-4 text-center text-foreground font-bold text-base">Created</TableHead>
+                            <TableHead className="px-6 py-4 text-center text-foreground font-bold text-base">MFA</TableHead>
+                            <TableHead className="px-6 py-4 text-center text-foreground font-bold text-base">Password</TableHead>
                             <TableHead className="px-6 py-4">
                                 <div className="flex items-center justify-center gap-2 cursor-pointer font-bold text-base text-foreground" onClick={() => onSort?.("lastLoginAt")}>
                                     Last Login
@@ -84,7 +93,7 @@ export function UserTable({ users, onUpdateStatus, renderSubComponent, paginatio
                     <TableBody>
                         {users.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={renderSubComponent ? 8 : 7} className="h-24 text-center text-muted-foreground">
+                                <TableCell colSpan={renderSubComponent ? 11 : 10} className="h-24 text-center text-muted-foreground">
                                     No users found.
                                 </TableCell>
                             </TableRow>
@@ -115,6 +124,9 @@ export function UserTable({ users, onUpdateStatus, renderSubComponent, paginatio
                                                     {user.status}
                                                 </div>
                                             </TableCell>
+                                            <TableCell className="px-6 text-center text-sm">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}</TableCell>
+                                            <TableCell className="px-6 text-center text-sm">{user.mfaEnabled || user.totpEnabled ? "Enabled" : "Required"}</TableCell>
+                                            <TableCell className="px-6 text-center text-sm">{user.mustChangePassword ? "Change required" : "Current"}</TableCell>
                                             <TableCell className="px-6 text-center font-bold text-base text-foreground">
                                                 {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : "Never"}
                                             </TableCell>
@@ -139,6 +151,10 @@ export function UserTable({ users, onUpdateStatus, renderSubComponent, paginatio
                                                 )}
 
                                                 {user.totpEnabled && <ResetAuthenticatorDialog user={user} />}
+
+                                                {onRegenerateTemporaryPassword && <ResetTemporaryPasswordDialog user={user} onConfirm={(confirmation) => onRegenerateTemporaryPassword(user.id || user._id, confirmation)} />}
+
+                                                {onAssignRole && user.role !== "OWNER" && <Button variant="outline" size="sm" onClick={() => setRoleTarget(user)}>Change role</Button>}
 
                                                 </div>
                                             </TableCell>
@@ -185,14 +201,17 @@ export function UserTable({ users, onUpdateStatus, renderSubComponent, paginatio
                     : "Are you sure you want to disable this user? They will lose access to the platform."}
                 confirmText={statusUpdate?.status === "ACTIVE" ? "Enable User" : "Disable User"}
                 confirmVariant={statusUpdate?.status === "ACTIVE" ? "default" : "destructive"}
+                confirmationText={users.find(user => (user.id || user._id) === statusUpdate?.id)?.email || ""}
                 onOpenChange={(open) => !open && setStatusUpdate(null)}
-                onConfirm={(reason) => {
+                onConfirm={(reason, confirmation) => {
                     if (statusUpdate) {
-                        onUpdateStatus(statusUpdate.id, statusUpdate.status, reason)
+                        onUpdateStatus(statusUpdate.id, statusUpdate.status, reason, confirmation)
                         setStatusUpdate(null)
                     }
                 }}
             />
+
+            {roleTarget && onAssignRole && <AssignRoleDialog user={roleTarget} organizations={organizations} open={!!roleTarget} onOpenChange={(open) => !open && setRoleTarget(null)} onConfirm={(role, confirmation, orgId) => onAssignRole(roleTarget.id || roleTarget._id, role, confirmation, orgId)} />}
 
             {pagination && onPageChange && (
                 <DataPagination pagination={pagination} onPageChange={onPageChange} />

@@ -16,9 +16,9 @@ export function useBlockchain({ initialLimit = 7 } = {}) {
     } = useUrlPagination(initialLimit)
 
     const { data, isLoading, isError, error } = useQuery({
-        queryKey: ["blockchain", "ledger", queryParams],
+        queryKey: ["blockchain", "transactions", queryParams],
         queryFn: async () => {
-            const ledgerParams = {
+            const transactionParams = {
                 ...queryParams,
                 sortBy: (queryParams.sortBy === "anchoredAt" || queryParams.sortBy === "invoiceNumber")
                     ? queryParams.sortBy
@@ -26,13 +26,13 @@ export function useBlockchain({ initialLimit = 7 } = {}) {
             } as const
             
             try {
-                const response = await blockchainService.getLedger(ledgerParams)
+                const response = await blockchainService.getTransactions(transactionParams)
                 return {
                     items: response.data?.items || [],
                     pagination: response.data?.pagination || { total: 0, page: 1, limit: 10, totalPages: 1 }
                 }
             } catch (err) {
-                console.error("[useBlockchain] Error fetching ledger:", err)
+                console.error("[useBlockchain] Error fetching transactions:", err)
                 throw err
             }
         }

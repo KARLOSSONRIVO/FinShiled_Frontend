@@ -64,10 +64,10 @@ FinShield has 6 user roles, each with its own dashboard and capabilities:
 
 | Role | Dashboard Route | Key Capabilities |
 |------|----------------|-----------------|
-| `SUPER_ADMIN` | `/admin/superadmin` | Full system access: users, orgs, assignments, audit logs, blockchain, policies, terms |
+| `OWNER` | `/admin/owner` | Full system access: users, orgs, assignments, audit logs, blockchain, policies, terms |
 | `ADMINISTRATOR` | `/admin/admin` | Users, organizations, assignments |
 | `AUDITOR` | `/admin/external-auditor` | Review invoices for assigned companies |
-| `REGULATOR` | `/admin/regulator` | Read-only view of all invoices + blockchain ledger |
+| `REGULATOR` | `/admin/regulator` | Read-only view of all invoices + blockchain transactions |
 | `COMPANY_MANAGER` | `/company/manager` | Manage company invoices and employees |
 | `COMPANY_USER` | `/company/employee` | Upload and view own invoices |
 
@@ -94,7 +94,7 @@ AUDITOR reviews invoice (for assigned companies)
 Backend: anchor to blockchain (if approved)
   → INVOICE_ANCHOR_SUCCESS or INVOICE_ANCHOR_FAILED socket event
         ↓
-Invoice status: "anchored" — visible on blockchain ledger
+Invoice status: "anchored" — visible on blockchain transactions
 ```
 
 ---

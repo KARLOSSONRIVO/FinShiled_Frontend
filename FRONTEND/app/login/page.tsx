@@ -45,8 +45,9 @@ export default function LoginPage() {
   const redirectToDashboard = () => {
     if (!user) return
 
-    const roleRoutes: Record<string, string> = {
-      SUPER_ADMIN: "/admin/superadmin",
+      const roleRoutes: Record<string, string> = {
+        OWNER: "/admin/owner",
+        SYSTEM_ADMIN: "/admin/system-administrator",
       ADMINISTRATOR: "/admin/admin",
       ADMIN: "/admin/admin",
       AUDITOR: "/admin/external-auditor",
@@ -213,7 +214,7 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <h3 className="text-white font-semibold text-lg mb-2">Blockchain Verification</h3>
-                  <p className="text-gray-500 text-sm">Tamper-proof invoice records with immutable blockchain ledger</p>
+                  <p className="text-gray-500 text-sm">Tamper-proof invoice records with immutable blockchain transactions</p>
                 </div>
               </div>
 

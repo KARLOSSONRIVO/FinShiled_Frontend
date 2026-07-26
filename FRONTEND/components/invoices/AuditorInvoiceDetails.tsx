@@ -95,7 +95,7 @@ export function InvoiceDetails({ invoice }: { invoice: any }) {
                         <Blocks className="h-5 w-5" />
                         Blockchain Verification
                     </CardTitle>
-                    <p className="text-xs text-muted-foreground font-medium">Tamper-proof ledger record</p>
+                    <p className="text-xs text-muted-foreground font-medium">Tamper-proof Blockchain Transaction record</p>
                 </CardHeader>
                 <CardContent className="space-y-4 pt-4">
                     <div>

@@ -1,4 +1,4 @@
-﻿import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge"
 import type { InvoiceStatus, AIVerdict, UserStatus, ReviewDecision } from "@/lib/types"
 
 export function InvoiceStatusBadge({ status }: { status: InvoiceStatus }) {

@@ -42,7 +42,7 @@ This folder contains the developer documentation for the FinShield frontend appl
 | [components/auth/](./components/auth/auth.md) | Login, MFA input, password change, MFA settings |
 | [components/finance/](./components/finance/finance.md) | Invoice table, filters, detail, dashboard, reports, alerts |
 | [components/admin/](./components/admin/admin.md) | Organizations, users, assignments UI |
-| [components/compliance/](./components/compliance/compliance.md) | Audit logs, policy, blockchain ledger UI |
+| [components/compliance/](./components/compliance/compliance.md) | Audit logs, policy, blockchain transactions UI |
 | [components/settings/](./components/settings/settings.md) | Appearance, security, profile, sessions, terms |
 
 ## Project Structure
@@ -50,7 +50,7 @@ This folder contains the developer documentation for the FinShield frontend appl
 ```
 FRONTEND/
 ├── app/                    # Next.js App Router pages & layouts
-│   ├── admin/              # Admin role routes (super admin, auditor, regulator)
+│   ├── admin/              # Admin role routes (Owner, auditor, regulator)
 │   ├── company/            # Company role routes (manager, employee)
 │   ├── dashboard/          # Dashboard route
 │   ├── login/              # Auth pages

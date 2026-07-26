@@ -15,7 +15,7 @@ import { usePersistedSidebar } from "@/hooks/global/use-persisted-sidebar"
 
 const internalAuditorLinks: NavLink[] = [
     { href: "/company/internal-auditor", label: "Verification Queue", icon: LayoutDashboard },
-    { href: "/company/internal-auditor/audit-logs", label: "Audit Logs", icon: ScrollText },
+    { href: "/company/internal-auditor/review-history", label: "Review History", icon: ScrollText },
     { href: "/company/internal-auditor/reports", label: "Reports", icon: BarChart3 },
     { href: "/company/internal-auditor/settings", label: "Settings", icon: Settings2 },
 ]
@@ -32,7 +32,7 @@ export default function InternalAuditorLayout({
     const getPageTitle = (path: string) => {
         if (path === "/company/internal-auditor") return "Verification Queue"
         if (path.includes("/verification")) return "Invoice Inspector"
-        if (path.includes("/audit-logs")) return "Audit Logs"
+        if (path.includes("/review-history")) return "Review History"
         if (path.includes("/reports")) return "Auditor Reports"
         if (path.includes("/settings")) return "Settings"
         return "Internal Auditor Workspace"

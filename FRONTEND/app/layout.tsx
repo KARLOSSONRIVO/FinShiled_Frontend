@@ -54,7 +54,6 @@ export default function RootLayout({
         <Analytics />
         <Toaster
           position="bottom-right"
-          duration={30000}
           closeButton
           visibleToasts={1}
         />

@@ -18,7 +18,7 @@ They consume services from `services/` and expose clean, typed interfaces to com
 | [company-manager.md](./company-manager.md) | COMPANY_MANAGER | Invoice management, team overview, manager dashboard |
 | [auditor.md](./auditor.md) | AUDITOR | Assigned company invoices, audit review workflows |
 | [regulator.md](./regulator.md) | REGULATOR | Cross-org regulatory views |
-| [super-admin.md](./super-admin.md) | SUPER_ADMIN | System-wide admin operations |
+| [owner.md](./owner.md) | OWNER | System-wide admin operations |
 | [auth.md](./auth.md) | All | `useAuthContext`, MFA hooks |
 | [common.md](./common.md) | All | Shared hooks used across roles |
 | [filters.md](./filters.md) | — | Reusable filter state hooks |

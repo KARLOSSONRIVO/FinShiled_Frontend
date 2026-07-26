@@ -3,7 +3,7 @@ import { PaginatedResponse, AuditLog, AuditLogQuery } from "@/lib/types"
 
 export const AuditService = {
     /**
-     * Fetch audit logs. Only works for SUPER_ADMIN.
+     * Fetch audit logs. Only works for OWNER.
      * Hard-codes sortBy to createdAt as per requirements.
      */
     getLogs: async (params?: AuditLogQuery): Promise<PaginatedResponse<AuditLog>> => {

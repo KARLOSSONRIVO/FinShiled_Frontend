@@ -1,4 +1,4 @@
-﻿export const VERDICT_STYLES: Record<string, string> = {
+export const VERDICT_STYLES: Record<string, string> = {
     clean: "bg-emerald-600 text-white",
     flagged: "bg-red-600 text-white",
     // Fallback

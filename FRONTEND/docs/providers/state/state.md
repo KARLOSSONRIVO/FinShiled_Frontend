@@ -74,7 +74,7 @@ The 5s timeout prevents `isLoading` from hanging indefinitely when the backend i
 
 | Role | Redirect |
 |------|---------|
-| `SUPER_ADMIN` | `/admin/superadmin` |
+| `OWNER` | `/admin/owner` |
 | `ADMINISTRATOR` / `ADMIN` | `/admin/admin` |
 | `AUDITOR` | `/admin/external-auditor` |
 | `REGULATOR` | `/admin/regulator` |

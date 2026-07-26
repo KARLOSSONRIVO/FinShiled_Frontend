@@ -7,10 +7,11 @@ interface ManagerEmployeeTableProps {
     users: User[]
     sortConfig: any
     onSort: (key: any) => void
-    onUpdateStatus: (userId: string, status: "ACTIVE" | "INACTIVE", reason?: string) => void
+    onUpdateStatus: (userId: string, status: "ACTIVE" | "INACTIVE", reason: string | undefined, confirmation: string) => void
+    onRegenerateTemporaryPassword: (userId: string, confirmation: string) => void
 }
 
-export function ManagerEmployeeTable({ users, sortConfig, onSort, onUpdateStatus }: ManagerEmployeeTableProps) {
+export function ManagerEmployeeTable({ users, sortConfig, onSort, onUpdateStatus, onRegenerateTemporaryPassword }: ManagerEmployeeTableProps) {
     return (
         <UserTable
             users={users}
@@ -19,6 +20,7 @@ export function ManagerEmployeeTable({ users, sortConfig, onSort, onUpdateStatus
             onSort={onSort}
             hideRoleAndOrg={true}
             onUpdateStatus={onUpdateStatus}
+            onRegenerateTemporaryPassword={onRegenerateTemporaryPassword}
         />
     )
 }

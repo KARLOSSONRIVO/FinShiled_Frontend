@@ -23,12 +23,12 @@ export const MyService = {
 | [auth.service.md](./auth.service.md) | `/auth` | All |
 | [invoice.service.md](./invoice.service.md) | `/invoice` | All (scoped by role server-side) |
 | [dashboard.service.md](./dashboard.service.md) | `/dashboard` | All (role-specific endpoints) |
-| [organization.service.md](./organization.service.md) | `/organization` | SUPER_ADMIN, ADMIN, COMPANY_MANAGER |
-| [user.service.md](./user.service.md) | `/user` | SUPER_ADMIN, ADMIN, COMPANY_MANAGER |
-| [assignment.service.md](./assignment.service.md) | `/assignment` | SUPER_ADMIN, ADMIN |
-| [audit.service.md](./audit.service.md) | `/audit` | AUDITOR, SUPER_ADMIN |
-| [blockchain.service.md](./blockchain.service.md) | `/blockchain` | SUPER_ADMIN, COMPANY_MANAGER |
-| [policy.service.md](./policy.service.md) | `/policy` | SUPER_ADMIN, ADMIN, REGULATOR |
+| [organization.service.md](./organization.service.md) | `/organization` | OWNER, ADMIN, COMPANY_MANAGER |
+| [user.service.md](./user.service.md) | `/user` | OWNER, ADMIN, COMPANY_MANAGER |
+| [assignment.service.md](./assignment.service.md) | `/assignment` | OWNER, ADMIN |
+| [audit.service.md](./audit.service.md) | `/audit` | AUDITOR, OWNER |
+| [blockchain.service.md](./blockchain.service.md) | `/blockchain` | OWNER, COMPANY_MANAGER |
+| [policy.service.md](./policy.service.md) | `/policy` | OWNER, ADMIN, REGULATOR |
 | [session.service.md](./session.service.md) | `/session` | All |
 | [terms.service.md](./terms.service.md) | `/terms` | All |
 

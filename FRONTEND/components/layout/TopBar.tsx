@@ -178,7 +178,7 @@ export function TopBar({
                                 )}
                             </DropdownMenuItem>
                         </Link>
-                        {user?.role === 'SUPER_ADMIN' && (
+                        {user?.role === 'OWNER' && (
                             <DropdownMenuItem className="cursor-pointer">
                                 <Wallet className="mr-2 h-4 w-4" />
                                 <span className="font-medium">Wallet</span>

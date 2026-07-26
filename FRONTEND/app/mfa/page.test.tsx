@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 
 vi.stubGlobal("ResizeObserver", class {
     observe() {}
@@ -46,9 +46,9 @@ function store(overrides: Record<string, unknown> = {}) {
         tempToken: "temporary-token",
         enabledMfaMethods: ["email"],
         defaultMfaMethod: "email",
-        selectedMethod: "email",
+        selectedMethod: null,
         maskedEmail: "p*****@example.com",
-        emailCodeSent: true,
+        emailCodeSent: false,
         ...overrides,
     }))
 }
@@ -68,12 +68,34 @@ describe("mandatory MFA method selection", () => {
         expect(screen.queryByRole("button", { name: "Authenticator application" })).not.toBeInTheDocument()
     })
 
+    it("shows a blocking sending modal until the email request finishes", async () => {
+        store()
+        let finishRequest!: (value: { data: { resendAvailableAt: string } }) => void
+        mocks.selectMethod.mockReturnValueOnce(new Promise((resolve) => {
+            finishRequest = resolve
+        }))
+        render(<MfaPage />)
+
+        fireEvent.click(await screen.findByRole("button", { name: "Verify through email" }))
+
+        expect(await screen.findByRole("dialog", { name: /Sending verification email/i })).toBeVisible()
+
+        await act(async () => {
+            finishRequest({
+                data: { resendAvailableAt: new Date(Date.now() + 60_000).toISOString() },
+            })
+        })
+
+        await waitFor(() => expect(screen.queryByRole("dialog", { name: /Sending verification email/i })).not.toBeInTheDocument())
+    })
+
     it("renders all six OTP slots after email verification is selected", async () => {
         store()
         const { container } = render(<MfaPage />)
 
         fireEvent.click(await screen.findByRole("button", { name: "Verify through email" }))
 
+        await waitFor(() => expect(mocks.selectMethod).toHaveBeenCalledWith("temporary-token", "email"))
         expect(await screen.findByRole("heading", { name: "Check your email" })).toBeVisible()
         expect(container.querySelectorAll('[data-slot="input-otp-slot"]')).toHaveLength(6)
     })
@@ -88,7 +110,7 @@ describe("mandatory MFA method selection", () => {
     it("uses authenticator as the main option when it is preferred and keeps email as fallback", async () => {
         store({
             defaultMfaMethod: "authenticator",
-            selectedMethod: "authenticator",
+            selectedMethod: null,
             enabledMfaMethods: ["email", "authenticator"],
             emailCodeSent: false,
         })

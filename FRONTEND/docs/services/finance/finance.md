@@ -22,7 +22,7 @@ Invalid `sortBy` values are silently stripped before the request to prevent `400
 InvoiceService.list(params?: PaginationQuery & { orgId?: string }): Promise<PaginatedResponse<ListInvoice>>
 ```
 `GET /invoice/list` — Fetches all invoices. Server-side scoping applies per role:
-- `SUPER_ADMIN` / `REGULATOR` → all invoices
+- `OWNER` / `REGULATOR` → all invoices
 - `AUDITOR` → only invoices belonging to assigned companies
 - `COMPANY_MANAGER` → only their company's invoices
 
@@ -96,8 +96,8 @@ interface DashboardStats {
   activeInvoices: number
   flaggedInvoices: number
   verifiedInvoices: number
-  totalUsers?: number        // Super admin only
-  totalCompanies?: number    // Super admin / regulator
+  totalUsers?: number        // Owner only
+  totalCompanies?: number    // Owner / regulator
   pendingReviews?: number    // Auditor only
   flaggedCount?: number      // Regulator only
   verifiedOnChain?: number   // Regulator only
@@ -109,11 +109,11 @@ interface DashboardStats {
 
 | Method | Role | Data Source |
 |--------|------|-------------|
-| `getSuperAdminStats()` | SUPER_ADMIN | Composes from `UserService.listUsers()` + `OrganizationService.listOrganizations()` |
+| `getOwnerStats()` | OWNER | Composes from `UserService.listUsers()` + `OrganizationService.listOrganizations()` |
 | `getCompanyStats()` | COMPANY_MANAGER | Placeholder — returns zeroed stats |
 | `getAuditorStats()` | AUDITOR | Placeholder — returns zeroed stats |
 | `getRegulatorStats()` | REGULATOR | Placeholder — returns zeroed stats |
-| `getRecentLogs()` | SUPER_ADMIN | Delegates to `AuditService.getLogs({ limit: 6, order: 'desc' })` |
+| `getRecentLogs()` | OWNER | Delegates to `AuditService.getLogs({ limit: 6, order: 'desc' })` |
 
 > [!WARNING]
 > `getCompanyStats()`, `getAuditorStats()`, and `getRegulatorStats()` currently return **zeroed placeholder data**. Real implementations are pending backend dashboard endpoints.

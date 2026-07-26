@@ -43,9 +43,9 @@ describe('UserService onboarding', () => {
     })
 
     it('uses the authorized regeneration endpoint without returning a password', async () => {
-        const response = await UserService.regenerateTemporaryPassword('user-1')
+        const response = await UserService.regenerateTemporaryPassword('user-1', 'user@example.com')
 
-        expect(mocks.post).toHaveBeenCalledWith('/user/user-1/regenerate-temporary-password')
+        expect(mocks.post).toHaveBeenCalledWith('/user/user-1/regenerate-temporary-password', { confirmation: 'user@example.com' })
         expect(response.data).not.toHaveProperty('temporaryPassword')
         expect(response.data.user).not.toHaveProperty('password')
     })

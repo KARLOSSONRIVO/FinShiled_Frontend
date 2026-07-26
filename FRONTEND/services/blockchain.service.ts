@@ -1,29 +1,26 @@
 import { apiClient } from "@/lib/api-client"
-import { PaginatedResponse, LedgerInvoice } from "@/lib/types"
+import { PaginatedResponse, BlockchainTransaction } from "@/lib/types"
 
-// Valid sortBy values per GET /blockchain/ledger docs
-type LedgerSortBy = "anchoredAt" | "invoiceNumber"
+// Valid sortBy values per GET /blockchain/transactions docs
+type BlockchainTransactionSortBy = "anchoredAt" | "invoiceNumber"
 
-interface LedgerParams {
+interface BlockchainTransactionParams {
     page?: number;
     limit?: number;
     search?: string;
-    sortBy?: LedgerSortBy;
+    sortBy?: BlockchainTransactionSortBy;
     order?: "asc" | "desc";
 }
 
 export const blockchainService = {
-    getLedger: async (params?: LedgerParams): Promise<PaginatedResponse<LedgerInvoice>> => {
+    getTransactions: async (params?: BlockchainTransactionParams): Promise<PaginatedResponse<BlockchainTransaction>> => {
         // Enforce valid sortBy only
         const cleanParams = params ? { ...params } : {}
         if (cleanParams.sortBy && !["anchoredAt", "invoiceNumber"].includes(cleanParams.sortBy)) {
             delete cleanParams.sortBy
             delete cleanParams.order
         }
-        const response = await apiClient.get<PaginatedResponse<LedgerInvoice>>("/blockchain/ledger", { params: cleanParams })
+        const response = await apiClient.get<PaginatedResponse<BlockchainTransaction>>("/blockchain/transactions", { params: cleanParams })
         return response.data
-    }
+    },
 }
-
-// Named export kept for backward compatibility
-export type BlockchainLedgerItem = LedgerInvoice

@@ -1,6 +1,6 @@
 # Compliance Services
 
-Audit log access, blockchain ledger verification, and terms & conditions management.
+Audit log access, blockchain transactions verification, and terms & conditions management.
 
 ---
 
@@ -9,7 +9,7 @@ Audit log access, blockchain ledger verification, and terms & conditions managem
 Provides access to the immutable audit trail of all user actions in the system.
 
 > [!IMPORTANT]
-> Only accessible by `SUPER_ADMIN`. All other roles receive a `403` from the backend.
+> Only accessible by `OWNER`. All other roles receive a `403` from the backend.
 
 ### Types
 
@@ -62,12 +62,12 @@ AuditService.getLogById(id: string): Promise<{ ok: boolean; data: AuditLog }>
 
 ## `blockchainService` — `services/blockchain.service.ts`
 
-Fetches the on-chain ledger of anchored invoices.
+Fetches the Blockchain Transaction records for anchored invoices.
 
 ### Types
 
 ```ts
-interface LedgerInvoice {
+interface BlockchainTransaction {
   id: string
   invoiceNumber: string
   company: string
@@ -76,21 +76,21 @@ interface LedgerInvoice {
   status: string
 }
 
-type LedgerSortBy = 'anchoredAt' | 'invoiceNumber'
+type BlockchainTransactionSortBy = 'anchoredAt' | 'invoiceNumber'
 ```
 
 ### Methods
 
-#### `getLedger(params?)`
+#### `getTransactions(params?)`
 ```ts
-blockchainService.getLedger(params?: LedgerParams): Promise<PaginatedResponse<LedgerInvoice>>
+blockchainService.getTransactions(params?: BlockchainTransactionParams): Promise<PaginatedResponse<BlockchainTransaction>>
 ```
-`GET /blockchain/ledger` — Returns invoices that have been anchored to the blockchain.
+`GET /blockchain/transactions` — Returns invoices that have been anchored to the blockchain.
 
 Only `anchoredAt` and `invoiceNumber` are valid `sortBy` values — any other value is silently removed before the request.
 
 > [!NOTE]
-> Note the lowercase export name: `blockchainService` (not `BlockchainService`). The type alias `BlockchainLedgerItem = LedgerInvoice` is exported for backward compatibility.
+> Note the lowercase export name: `blockchainService` (not `BlockchainService`). The type alias `BlockchainTransaction = BlockchainTransaction` is exported for backward compatibility.
 
 ---
 

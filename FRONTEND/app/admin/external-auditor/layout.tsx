@@ -23,7 +23,7 @@ const auditorLinks: NavLink[] = [
     { href: "/admin/external-auditor/flagged", label: "Flagged Queue", icon: AlertTriangle },
     { href: "/admin/external-auditor/pending", label: "Pending Queue", icon: AlertTriangle },
     { href: "/admin/external-auditor/reports", label: "Reports", icon: FileBarChart },
-    { href: "/admin/external-auditor/blockchain", label: "Blockchain Ledger", icon: Link2 },
+    { href: "/admin/external-auditor/blockchain", label: "Blockchain Transactions", icon: Link2 },
 ]
  
 export default function AuditorLayout({
@@ -43,7 +43,7 @@ export default function AuditorLayout({
         if (path.includes("/flagged")) return "Flagged Queue"
         if (path.includes("/pending")) return "Pending Queue"
         if (path.includes("/reports")) return "Reports"
-        if (path.includes("/blockchain")) return "Blockchain Ledger"
+        if (path.includes("/blockchain")) return "Blockchain Transactions"
         if (path.includes("/settings")) return "Profile Management"
         return "FinShield External Auditor"
     }

@@ -15,7 +15,7 @@ export interface paths {
         put?: never;
         /**
          * Create a new assignment
-         * @description Assign an auditor organization to a company organization (SUPER_ADMIN only)
+         * @description Assign an auditor organization to a company organization (OWNER only)
          */
         post: {
             parameters: {
@@ -68,7 +68,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description Forbidden - SUPER_ADMIN only */
+                /** @description Forbidden - OWNER only */
                 403: {
                     headers: {
                         [name: string]: unknown;
@@ -92,7 +92,7 @@ export interface paths {
         };
         /**
          * List all assignments
-         * @description Get a list of all auditor-company assignments (SUPER_ADMIN only)
+         * @description Get a list of all auditor-company assignments (OWNER only)
          */
         get: {
             parameters: {
@@ -123,7 +123,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description Forbidden - SUPER_ADMIN only */
+                /** @description Forbidden - OWNER only */
                 403: {
                     headers: {
                         [name: string]: unknown;
@@ -149,7 +149,7 @@ export interface paths {
         };
         /**
          * Get assignment by ID
-         * @description Get a specific assignment by ID (SUPER_ADMIN only)
+         * @description Get a specific assignment by ID (OWNER only)
          */
         get: {
             parameters: {
@@ -183,7 +183,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description Forbidden - SUPER_ADMIN only */
+                /** @description Forbidden - OWNER only */
                 403: {
                     headers: {
                         [name: string]: unknown;
@@ -217,7 +217,7 @@ export interface paths {
         get?: never;
         /**
          * Update assignment
-         * @description Update an existing assignment (SUPER_ADMIN only)
+         * @description Update an existing assignment (OWNER only)
          */
         put: {
             parameters: {
@@ -261,7 +261,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description Forbidden - SUPER_ADMIN only */
+                /** @description Forbidden - OWNER only */
                 403: {
                     headers: {
                         [name: string]: unknown;
@@ -296,7 +296,7 @@ export interface paths {
         post?: never;
         /**
          * Delete assignment
-         * @description Delete an existing assignment (SUPER_ADMIN only)
+         * @description Delete an existing assignment (OWNER only)
          */
         delete: {
             parameters: {
@@ -324,7 +324,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description Forbidden - SUPER_ADMIN only */
+                /** @description Forbidden - OWNER only */
                 403: {
                     headers: {
                         [name: string]: unknown;
@@ -772,7 +772,7 @@ export interface paths {
         put?: never;
         /**
          * Create a new organization
-         * @description Create a new organization (SUPER_ADMIN only)
+         * @description Create a new organization (OWNER only)
          */
         post: {
             parameters: {
@@ -822,7 +822,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description Forbidden - SUPER_ADMIN only */
+                /** @description Forbidden - OWNER only */
                 403: {
                     headers: {
                         [name: string]: unknown;
@@ -846,7 +846,7 @@ export interface paths {
         };
         /**
          * List all organizations
-         * @description Get a list of all organizations (SUPER_ADMIN only)
+         * @description Get a list of all organizations (OWNER only)
          */
         get: {
             parameters: {
@@ -877,7 +877,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description Forbidden - SUPER_ADMIN only */
+                /** @description Forbidden - OWNER only */
                 403: {
                     headers: {
                         [name: string]: unknown;
@@ -903,7 +903,7 @@ export interface paths {
         };
         /**
          * Get organization by ID
-         * @description Get a specific organization by ID. SUPER_ADMIN can access any org, others can only access their own.
+         * @description Get a specific organization by ID. OWNER can access any org, others can only access their own.
          */
         get: {
             parameters: {
@@ -1185,7 +1185,7 @@ export interface paths {
         };
         /**
          * List all users
-         * @description Get a list of all users (SUPER_ADMIN only)
+         * @description Get a list of all users (OWNER only)
          */
         get: {
             parameters: {
@@ -1216,7 +1216,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description Forbidden - SUPER_ADMIN only */
+                /** @description Forbidden - OWNER only */
                 403: {
                     headers: {
                         [name: string]: unknown;
@@ -1244,7 +1244,7 @@ export interface paths {
         put?: never;
         /**
          * Create a new user
-         * @description Create a new user. SUPER_ADMIN can create any role, COMPANY_MANAGER can only create COMPANY_USER.
+         * @description Create a new user. OWNER can create any role, COMPANY_MANAGER can only create COMPANY_USER.
          */
         post: {
             parameters: {
@@ -1274,7 +1274,7 @@ export interface paths {
                          * @example COMPANY_USER
                          * @enum {string}
                          */
-                        role: "SUPER_ADMIN" | "AUDITOR" | "REGULATOR" | "COMPANY_MANAGER" | "COMPANY_USER";
+                        role: "OWNER" | "SYSTEM_ADMIN" | "AUDITOR" | "REGULATOR" | "COMPANY_MANAGER" | "COMPANY_USER";
                         /** @example 507f1f77bcf86cd799439011 */
                         organizationId?: string;
                     };
@@ -1332,7 +1332,7 @@ export interface paths {
         };
         /**
          * Get user by ID
-         * @description Get a specific user by ID. SUPER_ADMIN can access any user, COMPANY_MANAGER can only access users in their org.
+         * @description Get a specific user by ID. OWNER can access any user, COMPANY_MANAGER can only access users in their org.
          */
         get: {
             parameters: {
@@ -1400,7 +1400,7 @@ export interface paths {
         get?: never;
         /**
          * Update user
-         * @description Update user status (SUPER_ADMIN only)
+         * @description Update user status (OWNER only)
          */
         put: {
             parameters: {
@@ -1444,7 +1444,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description Forbidden - SUPER_ADMIN only */
+                /** @description Forbidden - OWNER only */
                 403: {
                     headers: {
                         [name: string]: unknown;
@@ -1485,7 +1485,7 @@ export interface components {
              * @example user@example.com
              */
             email?: string;
-            /** @example super_admin */
+            /** @example owner */
             username?: string;
             /** @example John */
             firstName?: string;
@@ -1495,7 +1495,7 @@ export interface components {
              * @example COMPANY_USER
              * @enum {string}
              */
-            role?: "SUPER_ADMIN" | "AUDITOR" | "REGULATOR" | "COMPANY_MANAGER" | "COMPANY_USER";
+            role?: "OWNER" | "SYSTEM_ADMIN" | "AUDITOR" | "REGULATOR" | "COMPANY_MANAGER" | "COMPANY_USER";
             /** @example 507f1f77bcf86cd799439011 */
             organizationId?: string;
             /**

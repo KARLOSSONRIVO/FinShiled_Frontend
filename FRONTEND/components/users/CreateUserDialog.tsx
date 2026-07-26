@@ -14,7 +14,7 @@ import {
     DialogTrigger,
     DialogClose,
 } from "@/components/ui/dialog"
-import { Plus, X, Loader2 } from "lucide-react"
+import { X, Loader2 } from "lucide-react"
 import type { Organization } from "@/lib/types"
 
 interface CreateUserDialogProps {
@@ -110,6 +110,7 @@ export function CreateUserDialog({
                                 <SelectItem value="AUDITOR">External Auditor</SelectItem>
                                 <SelectItem value="REGULATOR">Regulator</SelectItem>
                                 <SelectItem value="COMPANY_MANAGER">Company Manager</SelectItem>
+                                <SelectItem value="COMPANY_USER">Company User</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
