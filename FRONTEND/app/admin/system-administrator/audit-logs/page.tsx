@@ -1,41 +1,72 @@
-'use client'
+"use client"
 
-import { Filter } from "lucide-react"
-import { Button } from "@/components/ui/button"
-
+import { useEffect, useState } from "react"
+import { AlertCircle, Filter } from "lucide-react"
+import { AuditLogDetailsDialog } from "@/components/audit-logs/AuditLogDetailsDialog"
 import { AuditLogTable } from "@/components/audit-logs/AuditLogTable"
-import { AuditLogTableSkeleton } from "@/components/skeletons/audit-log-table-skeleton"
-import { useAuditLogs } from "@/hooks/audit/use-system-admin-audit-logs"
-import { Pagination } from "@/components/ui/pagination-custom"
 import { SearchInput } from "@/components/common/SearchInput"
-import { AuditActions } from "@/lib/types"
-
+import { AuditLogTableSkeleton } from "@/components/skeletons/audit-log-table-skeleton"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuCheckboxItem
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
+import { Pagination } from "@/components/ui/pagination-custom"
+import { useAuditLogs } from "@/hooks/audit/use-system-admin-audit-logs"
+import { AuditActions, type AuditLog } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
-// Helper values for filtering definitions
 const ROLES = ["OWNER", "SYSTEM_ADMIN", "COMPANY_MANAGER", "COMPANY_USER", "AUDITOR", "REGULATOR"]
-const ACTIONS = Object.values(AuditActions)
 
-const ACTION_GROUPS = {
-  "Authentication": [AuditActions.LOGIN_SUCCESS, AuditActions.ACCOUNT_LOCKED, AuditActions.LOGOUT],
-  "MFA": [AuditActions.MFA_ENABLED, AuditActions.MFA_DISABLED],
-  "User Management": [AuditActions.USER_CREATED, AuditActions.USER_UPDATED, AuditActions.USER_DISABLED, AuditActions.USER_ENABLED, AuditActions.PASSWORD_RESET_FORCED],
-  "Organization": [AuditActions.ORG_CREATED, AuditActions.ORG_TEMPLATE_UPLOADED],
-  "Assignments": [AuditActions.ASSIGNMENT_CREATED, AuditActions.ASSIGNMENT_UPDATED, AuditActions.ASSIGNMENT_DELETED],
-  "Invoices": [AuditActions.INVOICE_UPLOADED, AuditActions.INVOICE_FLAGGED],
-  "Reviews": [AuditActions.REVIEW_SUBMITTED, AuditActions.REVIEW_UPDATED],
-  "Policies": [AuditActions.POLICY_CREATED, AuditActions.POLICY_UPDATED, AuditActions.POLICY_DELETED],
+const ACTION_GROUPS: Record<string, AuditActions[]> = {
+  Authentication: [AuditActions.LOGIN_SUCCESS, AuditActions.LOGIN_FAILURE, AuditActions.ACCOUNT_LOCKED, AuditActions.LOGOUT],
+  MFA: [
+    AuditActions.MFA_EMAIL_CODE_REQUESTED,
+    AuditActions.MFA_EMAIL_VERIFIED,
+    AuditActions.MFA_EMAIL_VERIFICATION_FAILED,
+    AuditActions.MFA_AUTHENTICATOR_SETUP_STARTED,
+    AuditActions.MFA_AUTHENTICATOR_ENABLED,
+    AuditActions.MFA_AUTHENTICATOR_VERIFIED,
+    AuditActions.MFA_AUTHENTICATOR_FAILED,
+    AuditActions.MFA_AUTHENTICATOR_REMOVED,
+    AuditActions.MFA_AUTHENTICATOR_REPLACED,
+    AuditActions.MFA_PREFERRED_METHOD_CHANGED,
+    AuditActions.MFA_ADMIN_AUTHENTICATOR_RESET,
+    AuditActions.MFA_EXCESSIVE_ATTEMPTS,
+  ],
+  "User Management": [
+    AuditActions.USER_CREATED,
+    AuditActions.USER_UPDATED,
+    AuditActions.USER_DISABLED,
+    AuditActions.USER_ENABLED,
+    AuditActions.WELCOME_EMAIL_SENT,
+    AuditActions.WELCOME_EMAIL_FAILED,
+    AuditActions.PASSWORD_CHANGED,
+    AuditActions.PASSWORD_RESET_FORCED,
+    AuditActions.FORCED_PASSWORD_CHANGE_COMPLETED,
+    AuditActions.USER_ROLE_CHANGED,
+  ],
+  "System Administration": [
+    AuditActions.SYSTEM_ADMIN_CREATED,
+    AuditActions.SYSTEM_ADMIN_ENABLED,
+    AuditActions.SYSTEM_ADMIN_DISABLED,
+    AuditActions.SYSTEM_ADMIN_ACCESS_RESET,
+    AuditActions.PLATFORM_CONFIGURATION_CHANGED,
+    AuditActions.MAINTENANCE_MODE_CHANGED,
+  ],
+  Organization: [AuditActions.ORG_CREATED, AuditActions.ORG_UPDATED, AuditActions.ORG_TEMPLATE_UPLOADED],
+  Assignments: [AuditActions.ASSIGNMENT_CREATED, AuditActions.ASSIGNMENT_UPDATED, AuditActions.ASSIGNMENT_DELETED],
+  Invoices: [AuditActions.INVOICE_UPLOADED, AuditActions.INVOICE_FLAGGED],
+  Reviews: [AuditActions.REVIEW_SUBMITTED, AuditActions.REVIEW_UPDATED],
+  Policies: [AuditActions.POLICY_CREATED, AuditActions.POLICY_UPDATED, AuditActions.POLICY_DELETED],
   "Terms and Conditions": [AuditActions.TERMS_CREATED, AuditActions.TERMS_UPDATED, AuditActions.TERMS_DELETED],
-  "Archival": [AuditActions.ARCHIVE_EXECUTED, AuditActions.ARCHIVE_ACCESSED]
+  Archival: [AuditActions.ARCHIVE_EXECUTED, AuditActions.ARCHIVE_ACCESSED],
 }
 
 export default function AuditLogsPage() {
@@ -44,118 +75,188 @@ export default function AuditLogsPage() {
     setSearch,
     action,
     actorRole,
+    location,
+    countryCode,
     setFilter,
     setFilters,
     auditLogs,
     pagination,
     setPage,
     isLoading,
+    isError,
+    error,
+    refetch,
     sortConfig,
-    requestSort
+    requestSort,
   } = useAuditLogs()
+  const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null)
+  const [countryDraft, setCountryDraft] = useState(countryCode || "")
 
-  const FilterActionItem = ({ val }: { val: string }) => (
-    <DropdownMenuCheckboxItem
-      checked={action === val}
-      onCheckedChange={() => setFilter("action", action === val ? null : val)}
-      className="text-xs"
-    >
-      {val.replace(/_/g, " ")}
-    </DropdownMenuCheckboxItem>
-  )
+  useEffect(() => setCountryDraft(countryCode || ""), [countryCode])
 
-  const FilterRoleItem = ({ val }: { val: string }) => (
-    <DropdownMenuCheckboxItem
-      checked={actorRole === val}
-      onCheckedChange={() => setFilter("actorRole", actorRole === val ? null : val)}
-      className="text-xs"
-    >
-      {val.replace(/_/g, " ")}
-    </DropdownMenuCheckboxItem>
-  )
+  const filtersActive = Boolean(action || actorRole || location || countryCode)
+
+  const commitCountryFilter = () => {
+    const normalized = countryDraft.trim().toUpperCase()
+    if (normalized.length === 0 || normalized.length === 2) {
+      setFilter("countryCode", normalized || null)
+    }
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div>
         <h2 className="text-2xl font-normal tracking-tight">System Audit Logs</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Immutable security and administrative events with approximate request locations.</p>
       </div>
 
-      <div>
-        <div className="flex flex-wrap gap-4">
-          <div className="flex-1 min-w-[300px]">
-            <SearchInput
-              value={search || ""}
-              onChange={setSearch}
-              placeholder="Search by action summary..."
-            />
-          </div>
+      <div className="flex flex-wrap gap-3">
+        <SearchInput
+          value={search || ""}
+          onChange={setSearch}
+          placeholder="Search actor, action, or summary"
+          className="min-w-[260px]"
+        />
+        <SearchInput
+          value={location || ""}
+          onChange={(value) => setFilter("location", value || null)}
+          placeholder="Filter city, region, or country"
+          className="min-w-[260px]"
+        />
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant={action || actorRole ? "default" : "outline"} className={cn("gap-2 shrink-0 border-2 font-medium px-6 text-base", !(action || actorRole) && "bg-white hover:bg-gray-50 text-foreground border-black/10")}>
-                <Filter className="h-4 w-4" />
-                Filters {(action || actorRole) ? "(Active)" : ""}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant={filtersActive ? "default" : "outline"}
+              className={cn(
+                "shrink-0 gap-2 border-2 px-6 text-base font-medium",
+                !filtersActive && "border-black/10 bg-white text-foreground hover:bg-gray-50",
+              )}
+            >
+              <Filter className="h-4 w-4" />
+              Filters {filtersActive ? "(Active)" : ""}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="max-h-[70vh] w-[90vw] max-w-[640px] overflow-y-auto p-0">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-background/95 p-3 backdrop-blur">
+              <span className="text-sm font-semibold">Filter options</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setCountryDraft("")
+                  setFilters({ action: null, actorRole: null, search: null, location: null, countryCode: null })
+                }}
+                className="h-8 text-xs text-muted-foreground hover:text-foreground"
+                disabled={!filtersActive && !search}
+              >
+                Clear all
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[85vw] sm:w-[600px] max-h-[50vh] sm:max-h-[400px] overflow-y-auto overflow-x-hidden p-0">
-              <div className="sticky top-0 bg-background/95 backdrop-blur z-10 p-3 border-b flex items-center justify-between">
-                <span className="font-semibold text-sm">Filter Options</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setFilters({ action: null, actorRole: null, search: null })}
-                  className="h-8 text-xs text-muted-foreground hover:text-foreground"
-                  disabled={!action && !actorRole && !search}
-                >
-                  Clear All
-                </Button>
+            </div>
+
+            <div className="space-y-5 p-3">
+              <div>
+                <DropdownMenuLabel className="px-0 pb-2 pt-0 text-xs uppercase tracking-wider text-muted-foreground">
+                  Country code
+                </DropdownMenuLabel>
+                <Input
+                  value={countryDraft}
+                  maxLength={2}
+                  placeholder="PH"
+                  aria-label="Country code"
+                  className="max-w-32 uppercase"
+                  onChange={(event) => setCountryDraft(event.target.value.replace(/[^a-z]/gi, "").toUpperCase())}
+                  onBlur={commitCountryFilter}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault()
+                      commitCountryFilter()
+                    }
+                  }}
+                />
+                <p className="mt-1 text-xs text-muted-foreground">Use a two-letter ISO country code.</p>
               </div>
 
-              <div className="p-3">
-                <DropdownMenuLabel className="px-0 pt-0 pb-2 text-muted-foreground uppercase text-xs tracking-wider">Filter by Role</DropdownMenuLabel>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-6">
-                  {ROLES.map(r => <FilterRoleItem key={r} val={r} />)}
+              <DropdownMenuSeparator />
+              <div>
+                <DropdownMenuLabel className="px-0 pb-2 pt-0 text-xs uppercase tracking-wider text-muted-foreground">
+                  Actor role
+                </DropdownMenuLabel>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  {ROLES.map((role) => (
+                    <DropdownMenuCheckboxItem
+                      key={role}
+                      checked={actorRole === role}
+                      onCheckedChange={() => setFilter("actorRole", actorRole === role ? null : role)}
+                      className="text-xs"
+                    >
+                      {role.replace(/_/g, " ")}
+                    </DropdownMenuCheckboxItem>
+                  ))}
                 </div>
+              </div>
 
-                <DropdownMenuSeparator className="mb-4" />
-                <DropdownMenuLabel className="px-0 pt-0 pb-2 text-muted-foreground uppercase text-xs tracking-wider">Filter by Action</DropdownMenuLabel>
-
+              <DropdownMenuSeparator />
+              <div>
+                <DropdownMenuLabel className="px-0 pb-2 pt-0 text-xs uppercase tracking-wider text-muted-foreground">
+                  Action
+                </DropdownMenuLabel>
                 <div className="space-y-4">
                   {Object.entries(ACTION_GROUPS).map(([category, actions]) => (
                     <div key={category}>
-                      <span className="text-xs font-medium text-foreground px-2 mb-1 block">{category}</span>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 ml-2">
-                        {actions.map(a => <FilterActionItem key={a} val={a} />)}
+                      <span className="mb-1 block px-2 text-xs font-medium text-foreground">{category}</span>
+                      <div className="ml-2 grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+                        {actions.map((auditAction) => (
+                          <DropdownMenuCheckboxItem
+                            key={auditAction}
+                            checked={action === auditAction}
+                            onCheckedChange={() => setFilter("action", action === auditAction ? null : auditAction)}
+                            className="text-xs"
+                          >
+                            {auditAction.replace(/_/g, " ")}
+                          </DropdownMenuCheckboxItem>
+                        ))}
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-        </div>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      <div className="mt-4">
-        {isLoading ? (
-          <AuditLogTableSkeleton />
-        ) : (
-          <AuditLogTable
-            logs={auditLogs}
-            sortConfig={sortConfig}
-            requestSort={requestSort}
-          />
-        )}
-      </div>
-
-      <div className="mt-4 flex justify-center">
-        <Pagination
-          currentPage={pagination?.page || 1}
-          totalPages={pagination?.totalPages || 1}
-          onPageChange={setPage}
+      {isError ? (
+        <Alert variant="destructive">
+          <AlertCircle />
+          <AlertTitle>Audit logs could not be loaded</AlertTitle>
+          <AlertDescription>
+            <p>{error || "The audit service is temporarily unavailable."}</p>
+            <Button variant="outline" size="sm" className="mt-3" onClick={() => refetch()}>Try again</Button>
+          </AlertDescription>
+        </Alert>
+      ) : isLoading ? (
+        <AuditLogTableSkeleton />
+      ) : (
+        <AuditLogTable
+          logs={auditLogs}
+          sortConfig={sortConfig}
+          requestSort={requestSort}
+          onSelectLog={setSelectedLog}
         />
-      </div>
+      )}
+
+      {!isError && !isLoading && (pagination?.totalPages || 0) > 1 && (
+        <div className="flex justify-center">
+          <Pagination
+            currentPage={pagination?.page || 1}
+            totalPages={pagination?.totalPages || 1}
+            onPageChange={setPage}
+          />
+        </div>
+      )}
+
+      <AuditLogDetailsDialog log={selectedLog} onClose={() => setSelectedLog(null)} />
     </div>
   )
 }

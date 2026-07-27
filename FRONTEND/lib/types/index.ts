@@ -50,16 +50,40 @@ export interface Review {
 
 export enum AuditActions {
     LOGIN_SUCCESS = "LOGIN_SUCCESS",
+    LOGIN_FAILURE = "LOGIN_FAILURE",
     ACCOUNT_LOCKED = "ACCOUNT_LOCKED",
     LOGOUT = "LOGOUT",
     MFA_ENABLED = "MFA_ENABLED",
     MFA_DISABLED = "MFA_DISABLED",
+    MFA_AUTO_ENABLED = "MFA_AUTO_ENABLED",
+    MFA_EMAIL_CODE_REQUESTED = "MFA_EMAIL_CODE_REQUESTED",
+    MFA_EMAIL_VERIFIED = "MFA_EMAIL_VERIFIED",
+    MFA_EMAIL_VERIFICATION_FAILED = "MFA_EMAIL_VERIFICATION_FAILED",
+    MFA_AUTHENTICATOR_SETUP_STARTED = "MFA_AUTHENTICATOR_SETUP_STARTED",
+    MFA_AUTHENTICATOR_ENABLED = "MFA_AUTHENTICATOR_ENABLED",
+    MFA_AUTHENTICATOR_VERIFIED = "MFA_AUTHENTICATOR_VERIFIED",
+    MFA_AUTHENTICATOR_FAILED = "MFA_AUTHENTICATOR_FAILED",
+    MFA_AUTHENTICATOR_REMOVED = "MFA_AUTHENTICATOR_REMOVED",
+    MFA_AUTHENTICATOR_REPLACED = "MFA_AUTHENTICATOR_REPLACED",
+    MFA_PREFERRED_METHOD_CHANGED = "MFA_PREFERRED_METHOD_CHANGED",
+    MFA_ADMIN_AUTHENTICATOR_RESET = "MFA_ADMIN_AUTHENTICATOR_RESET",
+    MFA_EXCESSIVE_ATTEMPTS = "MFA_EXCESSIVE_ATTEMPTS",
     USER_CREATED = "USER_CREATED",
     USER_UPDATED = "USER_UPDATED",
     USER_DISABLED = "USER_DISABLED",
     USER_ENABLED = "USER_ENABLED",
+    WELCOME_EMAIL_SENT = "WELCOME_EMAIL_SENT",
+    WELCOME_EMAIL_FAILED = "WELCOME_EMAIL_FAILED",
     PASSWORD_RESET_FORCED = "PASSWORD_RESET_FORCED",
+    PASSWORD_CHANGED = "PASSWORD_CHANGED",
+    FORCED_PASSWORD_CHANGE_COMPLETED = "FORCED_PASSWORD_CHANGE_COMPLETED",
+    USER_ROLE_CHANGED = "USER_ROLE_CHANGED",
+    SYSTEM_ADMIN_CREATED = "SYSTEM_ADMIN_CREATED",
+    SYSTEM_ADMIN_ENABLED = "SYSTEM_ADMIN_ENABLED",
+    SYSTEM_ADMIN_DISABLED = "SYSTEM_ADMIN_DISABLED",
+    SYSTEM_ADMIN_ACCESS_RESET = "SYSTEM_ADMIN_ACCESS_RESET",
     ORG_CREATED = "ORG_CREATED",
+    ORG_UPDATED = "ORG_UPDATED",
     ORG_TEMPLATE_UPLOADED = "ORG_TEMPLATE_UPLOADED",
     ASSIGNMENT_CREATED = "ASSIGNMENT_CREATED",
     ASSIGNMENT_UPDATED = "ASSIGNMENT_UPDATED",
@@ -75,28 +99,48 @@ export enum AuditActions {
     POLICY_DELETED = "POLICY_DELETED",
     TERMS_CREATED = "TERMS_CREATED",
     TERMS_UPDATED = "TERMS_UPDATED",
-    TERMS_DELETED = "TERMS_DELETED"
+    TERMS_DELETED = "TERMS_DELETED",
+    PLATFORM_CONFIGURATION_CHANGED = "PLATFORM_CONFIGURATION_CHANGED",
+    MAINTENANCE_MODE_CHANGED = "MAINTENANCE_MODE_CHANGED"
+}
+
+export interface AuditLocation {
+    display: string;
+    city: string | null;
+    region: string | null;
+    country: string | null;
+    countryCode: string | null;
+    timezone: string | null;
+    lookupStatus: "RESOLVED" | "PRIVATE_IP" | "LOCAL_ENVIRONMENT" | "UNAVAILABLE" | "LOOKUP_FAILED" | "NOT_REQUESTED";
+    resolvedAt: string | null;
 }
 
 export interface AuditLog {
     id: string;
     _id?: string; // for backward compatibility
-    actorId: string;
-    actorRole: string;
+    actorId: string | null;
+    actorRole: string | null;
     actor: {
-        username: string;
-        email: string;
+        username: string | null;
+        email: string | null;
     };
     action: AuditActions | string;
     targetType?: string;
+    targetId?: string | null;
+    organizationId?: string | null;
     target?: {
         type: string;
         id?: string;
     };
     summary: string;
     metadata: Record<string, any>;
-    ip: string;
-    userAgent: string;
+    ipAddress: string | null;
+    ip: string | null;
+    location: AuditLocation;
+    userAgent: string | null;
+    requestId: string | null;
+    outcome: "SUCCESS" | "FAILURE" | "UNKNOWN";
+    failureReason: string | null;
     isArchived: boolean;
     archivedAt: string | null;
     archiveKey: string | null;
@@ -111,4 +155,16 @@ export interface AuditLogQuery extends PaginationQuery {
     actorRole?: string;
     from?: string; // ISO date string
     to?: string;   // ISO date string
+    location?: string;
+    countryCode?: string;
+    sortBy?: "createdAt" | "action" | "actorRole" | "country";
+    order?: "asc" | "desc";
+}
+
+export interface AuditLogPage {
+    items: AuditLog[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 }
